@@ -102,6 +102,7 @@ object AuthModule extends ModuleTrait with AuthData {
 
     def authTokenPraser(data : JsValue)(implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
         try {
+            println("---Im in authTokenPraser---")
             val att = cm.modules.get.get("att").map (x => x.asInstanceOf[AuthTokenTrait]).getOrElse(throw new Exception("no encrypt impl"))
 
             val auth_token = (data \ "token").asOpt[String].map (x => x).getOrElse(throw new Exception("input error"))
@@ -150,7 +151,7 @@ object AuthModule extends ModuleTrait with AuthData {
                 }
                 (Some(result), None)
 
-            }.getOrElse((pr, None))
+            }.getOrElse((Some(pr.get), None))
 
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
@@ -214,7 +215,7 @@ object AuthModule extends ModuleTrait with AuthData {
                 }
                 (Some(result), None)
 
-            }.getOrElse((pr, None))
+            }.getOrElse((Some(pr.get), None))
 
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
@@ -226,6 +227,7 @@ object AuthModule extends ModuleTrait with AuthData {
                             (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
 
         try {
+            println("---Im in checkAuthTokenExpire---")
             val auth = pr.map (x => x.get("auth").get).getOrElse(throw new Exception("token parse error"))
             val expire_in = (auth \ "expire_in").asOpt[Long].map (x => x).getOrElse(throw new Exception("token parse error"))
 

@@ -39,6 +39,10 @@ POST    /data/calc/report/summary               controllers.ReportController.rep
 
 #用户登录
 GET     /login                                  controllers.PagesController.login
+#管理員界面
+GET     /admin                                  controllers.PagesController.admin
+#用户查询
+POST    /userInfo/queryUserAll                  controllers.UserManageController.queryUsers
 #个人中心
 GET     /userInfo                               controllers.PagesController.userInfo
 

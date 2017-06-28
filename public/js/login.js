@@ -12,7 +12,11 @@ $(function(){
             if(data.status == "ok") {
                 $.cookie("token",data.result.auth_token);
                 $.cookie("user_name",data.result.user.user_name)
-                window.location="/data/report"
+                if(data.result.user.user_name=="admin"){
+                    window.location="/admin"
+                }else {
+                    window.location = "/data/report"
+                }
             }
         }, function(e){$("#errText").show();$("#noErr").hide()})
     })

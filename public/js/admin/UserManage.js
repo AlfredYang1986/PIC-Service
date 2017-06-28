@@ -115,7 +115,7 @@ $("#grid").kendoGrid({
          template : "<span class='row-number'></span>",
          editable : false
      }*/, {
-         field: "loginName",
+         field: "user_name",
          title: "用户名",
          width: 120
      }, {
