@@ -13,6 +13,7 @@ $(function(){
         "reportid": md5report
     })
     ajaxData("/data/query/reportparameter", data, "POST", function(r){
+        window.console.log(r)
         if(r.status == "ok") {
             $(".categoryclasstitle").text(" • " + r.parameter.condition.category);
             $(".categoryclass").text(r.parameter.condition.category);
@@ -32,10 +33,17 @@ var reportajax = function(data) {
         reportgraphseven(r2.reportgraphseven)
         reportgrapheight(r2.reportgrapheight)
         reportgraphsix(r2.reportgraphsix)
+        // reportTableOne(r2.ReportTableOne)
         // console.info(r2)
     }, function(e2){console.error(e2)})
 }
-
+var reportTableOne=function (obj) {
+    // var productNumber=obj.productNumber.toArray().map()
+    // var manufacture_type=obj.manufacture_type
+    // var percentGrowth=obj.percentGrowth
+    // var marketShare=obj.marketShare
+    // window.console.log(productNumber)
+}
 var reportgraphone = function(obj) {
     var xAxisData = [], seriesData_sales = [], seriesData_trend = [];
     $.each(obj, function (i, v) {

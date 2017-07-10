@@ -52,10 +52,6 @@ $(document).ready(function () {
 
     showAtcInfo()
     showleft()
-
-    $("#userInfo").click(function () {
-        window.open("/userInfo")
-    })
 });
 
 

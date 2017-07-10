@@ -2,6 +2,7 @@ package bminjection.db.MongoDB
 
 import bminjection.db.DBTrait
 import bmutil.dao.{_data_connection, from}
+import com.mongodb.casbah.Imports
 import com.mongodb.casbah.Imports._
 import play.api.libs.json.JsValue
 
@@ -37,7 +38,8 @@ trait MongoDBImpl extends DBTrait {
                            (implicit t : DBObject => Map[String, JsValue]) : List[Map[String, JsValue]] = {
         (from db() in db_name where condition).selectSkipTop(skip)(take)(sort)(x => t(x)).toList
     }
-
+    
+ 
     override def deleteObject(obj: DBObject, db_name: String, primary_key: String): Unit = {
         val primary = obj.get(primary_key) //.map (x => x).getOrElse(throw new Exception("get primary key error"))
         (from db() in db_name where (primary_key -> primary) select(x =>x)).toList match {
@@ -64,4 +66,5 @@ trait MongoDBImpl extends DBTrait {
     override def aggregate(condition : DBObject, db_name : String, group : DBObject)
                  (implicit t : DBObject => Map[String, JsValue]) : Option[Map[String, JsValue]] =
         Some(t((from db() in db_name where condition).aggregate(group)))
+    
 }

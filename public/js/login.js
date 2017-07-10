@@ -18,6 +18,8 @@ $(function(){
                 $.cookie("user_name",data.result.user.user_name);
                 var ip = $.cookie("cname")+":"+$.cookie("cip");
                 importLoginLog(data.result.user.user_name,ip);
+            }else{
+                alert("用户名或密码错误！")
             }
         }, function(e){console.info(e)})
     })

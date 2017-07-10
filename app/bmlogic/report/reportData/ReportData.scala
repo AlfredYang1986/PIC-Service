@@ -19,5 +19,6 @@ trait ReportData {
 	implicit val d2m: DBObject => Map[String, JsValue] = { dbo =>
 		
 		Map("test" -> toJson(0))
+		
 	}
 }

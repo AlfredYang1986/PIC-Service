@@ -15,14 +15,16 @@ trait DBTrait {
     def queryMultipleObject(condition : DBObject, db_name : String, sort : String = "date", skip : Int = 0, take : Int = 20)
                            (implicit t : DBObject => Map[String, JsValue]) : List[Map[String, JsValue]]
 
+
     def querySum(condition : DBObject, db_name : String)
                 (sum : (Map[String, JsValue], Map[String, JsValue]) => Map[String, JsValue])
                 (acc: (DBObject) => Map[String, JsValue]) : Option[Map[String, JsValue]]
 
     def aggregate(condition : DBObject, db_name : String, group : DBObject)
                  (implicit t : DBObject => Map[String, JsValue]) : Option[Map[String, JsValue]]
-
+   
     def deleteObject(obj : DBObject, db_name : String, primary_key : String) : Unit
+
 
     def restoreDatabase() = ???
     def dumpDatabase() = ???

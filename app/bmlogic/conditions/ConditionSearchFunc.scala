@@ -138,7 +138,6 @@ trait ConditionSearchFunc {
                 //                :: ("oral_name" :: "product_name" :: "manufacture_type"
                 :: ("manufacture_type" :: "product_type" :: "specifications" :: "package" :: Nil)
                 .map (equalsConditions[String](data, _))).filterNot(_ == None).map (_.get)
-        
         if (result.isEmpty) None
         else Some($and(result))
     }

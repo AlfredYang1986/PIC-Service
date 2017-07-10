@@ -5,33 +5,39 @@
 /**
  * 重置按钮
  */
-var reset = function() {
+var reset=function () {
+    var atc1=""
+    var atc2=""
+    var atc3=""
+    var oral_name=""
+    var product_name=""
+    var edge=""
+    var manufacture_type=""
+    var manufacture_name=""
+    var product_type=""
+    var specifications=""
+    var pac=""
+    $(".selectInfo").remove("div")
     $("#yearInputb").val("")
     $("#monthInputb").val("")
-    var array = [
-        "ATC1","ATC2","ATC3","genericnameinfo","product","province","manufacture","manufacturetype","dosage","specification","package"
-    ]
-    resetSelect(array)
-}
+    $("#guim").text("X")
+    $('#zengzl').text("X");
+    $("#fene").text("X")
+    $("#chanps").text("X")
 
-var resetSelect = function(array) {
-    $.each(array, function (i,v) {
-        $("#"+v+" option:first").prop("selected",true)
-        $("#"+v).trigger('change.select2');
-    });
-}
 
+}
 /**
  * 数据列表
  */
 var showDataList = function() {
-
+    $(".img").hide();
+    $(".dataTable").show();
     pageResult(1)
-    $(".imgs").hide();
-    $("#grid").show();
 }
 
 var pageResult = function(skip) {
+
     searchCount++
     $("#tbody").empty();
     var c = $.extend(getSearchValue(), getTime())
@@ -51,7 +57,6 @@ var pageResult = function(skip) {
         },
         "skip": skip
     });
-
     ajaxData("/data/search", data, "POST", function(r){
         if (r.status == "ok") {
             $("#tbody").empty();
