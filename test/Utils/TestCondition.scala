@@ -16,8 +16,6 @@ object TestCondition {
         var c:List[Map[String,JsValue]]=List(Map(""->toJson("")))
         conditionNum match {
             case 1 =>
-                println(time)
-                println(condition.head)
                 c = ConditionUtil.one_condition_with_time(condition.head, time)
                 println(c)
             case 2 =>

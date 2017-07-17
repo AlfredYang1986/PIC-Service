@@ -14,30 +14,30 @@ import scala.io.Source
   * Created by yym on 7/13/17.
   */
 object JsonFileUtil {
-    def writeJson(lsts:List[List[Map[String,JsValue]]],conditionNum:String,test_case:List[String],token:Map[String,JsValue],flag:Boolean): Unit ={
+    def writeJson(lsts:List[(String,List[Map[String,JsValue]])],conditionNum:String,flag:Boolean): Unit ={
         val file  = new File(".")
         val absolutePath = file.getAbsolutePath()
         val filePath:String=absolutePath+"//test//JsonFile//"+conditionNum+".txt"
         val out=new FileOutputStream(filePath,true)
         val writer=new PrintWriter(out)
-        lsts.map(lst=>lst.map{x=>
-            val condition= toJson(x)
-//            println(toJson(token.+("condition" -> condition)))
-            toJson(token.+("condition" -> condition))
-        })
-//        println(lsts)
-        println(test_case.length)
-        val testJs:ArrayBuffer[JsValue]=new ArrayBuffer[JsValue]()
-        for(i<-0 to test_case.length){
-           val t=toJson(Map(test_case(i)->lsts(i)))
-            println(t)
-            testJs.append(t)
+        val res=lsts.map {lst =>
+            val t = lst._2.map { x =>
+                val condition = toJson(x)
+                //              println(toJson(token.+("condition" -> condition)))
+                toJson(Map("condition" -> condition))
+            }
+            (lst._1 , t)
         }
-        println(testJs.head)
-        writer.println(toJson(Map("conditions"->testJs.toArray)).toString())
+        var conMap=Map("pic"->toJson("test"))
+        println(res.length)
+        for(data<-res){
+            conMap=conMap.+(data._1 -> toJson(data._2))
+        }
+        val conditions=toJson(Map("conditions" -> toJson(conMap)))
+        writer.println(conditions)
         writer.close()
     }
-    def readJson(conditionNum:String,test_case:String): Array[JsValue] = {
+    def readJson(conditionNum:String,test_case:String): List[Map[String,JsValue]] = {
         val file = new File(".")
         val absolutePath = file.getAbsolutePath()
         val filePath = absolutePath + "//test//JsonFile//" + conditionNum + ".txt"
@@ -47,7 +47,15 @@ object JsonFileUtil {
             val js=lines.next()
             jsArr.append(Json.parse(js))
         }
-        (jsArr.head \ "conditions" \ test_case).as[Array[JsValue]]
+
+        val conArr=(jsArr.head \ "conditions" \ test_case).as[List[JsValue]]
+        val res_map=conArr.map{x =>
+            val v=(x \ "condition").get
+            val k="condition"
+            println(Map(k -> v))
+            Map(k -> v)
+        }
+        res_map
     }
     
 }
