@@ -232,12 +232,13 @@ var showData = function() {
 
 
 var report = function() {
+    var c = $.extend(getSearchValue(), getTime())
     var result = showData()
-    if(result != ""){
+    if(result != ""&&c.date!=undefined){
         var w = window.open("")
         w.window.location = "/report"+result
     }else {
-        alert("error")
+        alert("请在选择时间后至少选择一个治疗类别或通用名或商品名进行搜索！")
     }
     // var w = window.open("")
     // w.window.location = "/report"+"aa"

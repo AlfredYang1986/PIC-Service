@@ -213,13 +213,19 @@ $(document).ready(function () {
 
 //选项框控制
 function showDig() {
-    $("#xssj").attr({"class":"screen-box","onclick":""})
-    $("#guim").text("")
-    $('#zengzl').text("");
-    $("#fene").text("")
-    $("#chanps").text("")
-    showDataList()
-    showDataGather()
+    var c = $.extend(getSearchValue(), getTime())
+    var arr = Object.keys(c)
+    if(arr.length == 0){
+        alert("请至少在左边栏选择一个条件进行搜索！")
+    }else {
+        $("#xssj").attr({"class":"screen-box","onclick":""})
+        $("#guim").text("")
+        $('#zengzl').text("");
+        $("#fene").text("")
+        $("#chanps").text("")
+        showDataList()
+        showDataGather()
+    }
 }
 //----------------------------------------------------登录信息--------------------------------
 $("#userInfo").click(function () {

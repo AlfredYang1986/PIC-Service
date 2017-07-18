@@ -23,14 +23,15 @@ class PICTestSpec extends Specification {
     val user_name = "alfred"
     val pwd = "12345"
 
+    //测试时把token临时调成10天 在bmlogic.auth.AuthModule.authWithPassword修改reVal值
     var token : String = null
 
     /**
       * 在这里输入搜索的时间条件：
       * timeType 间隔方式：以年计=>"year";以月计=>"month"，gap：间隔长短（1表示1年或1月）
       */
-    val endYear : Int = 2016
-    val endMonth : Int = 12
+    val endYear : Int = 2017
+    val endMonth : Int = 2
     val timeType : String = "year"
     val gap : Int = 1
 
@@ -86,15 +87,16 @@ class PICTestSpec extends Specification {
     def authToken =
     WsTestClient.withClient { client =>
         val result = Await.result(
-        new PICClient(client, "http://127.0.0.1:9000").authWithPasswordTest(user_name, pwd), time_out.seconds)
+        new PICClient(client, "http://127.0.0.1:8888").authWithPasswordTest(user_name, pwd), 30.seconds)
         token = result
         result must_!= ""
     }
 
     def getCateList =
         WsTestClient.withClient { client =>
+            println(s"&&token&&=>${token}")
             val result = Await.result(
-                new PICClient(client, "http://127.0.0.1:9000").getCateTest(), time_out.seconds)
+                new PICClient(client, "http://127.0.0.1:8888").getCateTest(), 30.seconds)
 
             atc_one = Map("atc_one" -> result.get("atc_one").get.asOpt[List[String]].get)
             atc_two = Map("atc_tow" -> result.get("atc_tow").get.asOpt[List[String]].get)
@@ -111,7 +113,9 @@ class PICTestSpec extends Specification {
             val date = testUtil.timeArrInstance(endYear,endMonth,"year",gap)
             val conditions = testUtil.getConditions(lists,date)
             val listStr = urlList.map{ url =>
-                val res = twoConditionCombination(client,url,token,conditions,time_out)
+                println(s"&&3_15_url=>${url}&&")
+                val res = twoConditionCombination(client,url,token,conditions,30)
+                println(s"&&3_15_u_res=>${res}&&")
                 res
             }
             val result = testUtil.listStrToStr(listStr,time_out)
@@ -122,7 +126,7 @@ class PICTestSpec extends Specification {
             val lists = List(atc_one)
             val date = testUtil.timeArrInstance(endYear,endMonth,"year",gap)
             val conditions = testUtil.getConditions(lists,date)
-            val resList = new PICClient(client, "http://127.0.0.1:9000").conditionSearchResult(token, conditions, skip, contains)
+            val resList = new PICClient(client, "http://127.0.0.1:8888").conditionSearchResult(token, conditions, skip, contains)
             val result = testUtil.listFutureToString(resList,time_out)
             result must_== "ok"
         }
@@ -132,7 +136,9 @@ class PICTestSpec extends Specification {
             val date = testUtil.timeArrInstance(endYear,endMonth,"month",gap)
             val conditions = testUtil.getConditions(lists,date)
             val listStr = urlList.map{ url =>
-                val res = twoConditionCombination(client,url,token,conditions,time_out)
+                println(s"&&3_16_url=>${url}&&")
+                val res = twoConditionCombination(client,url,token,conditions,30)
+                println(s"&&3_16_u_res=>${res}&&")
                 res
             }
             val result = testUtil.listStrToStr(listStr,time_out)
@@ -143,7 +149,7 @@ class PICTestSpec extends Specification {
             val lists = List(atc_one)
             val date = testUtil.timeArrInstance(endYear,endMonth,"month",gap)
             val conditions = testUtil.getConditions(lists,date)
-            val resList = new PICClient(client, "http://127.0.0.1:9000").conditionSearchResult(token, conditions, skip, contains)
+            val resList = new PICClient(client, "http://127.0.0.1:8888").conditionSearchResult(token, conditions, skip, contains)
             val result = testUtil.listFutureToString(resList,time_out)
             result must_== "ok"
         }
@@ -155,7 +161,9 @@ class PICTestSpec extends Specification {
             val date = testUtil.timeArrInstance(endYear,endMonth,"year",gap)
             val conditions = testUtil.getConditions(lists,date)
             val listStr = urlList.map{ url =>
-                val res = twoConditionCombination(client,url,token,conditions,time_out)
+                println(s"&&3_17_url=>${url}&&")
+                val res = twoConditionCombination(client,url,token,conditions,30)
+                println(s"&&3_17_u_res=>${res}&&")
                 res
             }
             val result = testUtil.listStrToStr(listStr,time_out)
@@ -166,7 +174,7 @@ class PICTestSpec extends Specification {
             val lists = List(atc_two)
             val date = testUtil.timeArrInstance(endYear,endMonth,"year",gap)
             val conditions = testUtil.getConditions(lists,date)
-            val resList = new PICClient(client, "http://127.0.0.1:9000").conditionSearchResult(token, conditions, skip, contains)
+            val resList = new PICClient(client, "http://127.0.0.1:8888").conditionSearchResult(token, conditions, skip, contains)
             val result = testUtil.listFutureToString(resList,time_out)
             result must_== "ok"
         }
@@ -176,7 +184,9 @@ class PICTestSpec extends Specification {
             val date = testUtil.timeArrInstance(endYear,endMonth,"month",gap)
             val conditions = testUtil.getConditions(lists,date)
             val listStr = urlList.map{ url =>
-                val res = twoConditionCombination(client,url,token,conditions,time_out)
+                println(s"&&3_18_url=>${url}&&")
+                val res = twoConditionCombination(client,url,token,conditions,30)
+                println(s"&&3_18_u_res=>${res}&&")
                 res
             }
             val result = testUtil.listStrToStr(listStr,time_out)
@@ -187,7 +197,7 @@ class PICTestSpec extends Specification {
             val lists = List(atc_two)
             val date = testUtil.timeArrInstance(endYear,endMonth,"month",gap)
             val conditions = testUtil.getConditions(lists,date)
-            val resList = new PICClient(client, "http://127.0.0.1:9000").conditionSearchResult(token, conditions, skip, contains)
+            val resList = new PICClient(client, "http://127.0.0.1:8888").conditionSearchResult(token, conditions, skip, contains)
             val result = testUtil.listFutureToString(resList,time_out)
             result must_== "ok"
         }
@@ -198,7 +208,9 @@ class PICTestSpec extends Specification {
             val date = testUtil.timeArrInstance(endYear,endMonth,"year",gap)
             val conditions = testUtil.getConditions(lists,date)
             val listStr = urlList.map{ url =>
-                val res = twoConditionCombination(client,url,token,conditions,time_out)
+                println(s"&&3_19_url=>${url}&&")
+                val res = twoConditionCombination(client,url,token,conditions,30)
+                println(s"&&3_19_u_res=>${res}&&")
                 res
             }
             val result = testUtil.listStrToStr(listStr,time_out)
@@ -209,7 +221,7 @@ class PICTestSpec extends Specification {
             val lists = List(atc_three)
             val date = testUtil.timeArrInstance(endYear,endMonth,"year",gap)
             val conditions = testUtil.getConditions(lists,date)
-            val resList = new PICClient(client, "http://127.0.0.1:9000").conditionSearchResult(token, conditions, skip, contains)
+            val resList = new PICClient(client, "http://127.0.0.1:8888").conditionSearchResult(token, conditions, skip, contains)
             val result = testUtil.listFutureToString(resList,time_out)
             result must_== "ok"
         }
@@ -219,7 +231,9 @@ class PICTestSpec extends Specification {
             val date = testUtil.timeArrInstance(endYear,endMonth,"month",gap)
             val conditions = testUtil.getConditions(lists,date)
             val listStr = urlList.map{ url =>
-                val res = twoConditionCombination(client,url,token,conditions,time_out)
+                println(s"&&3_20_url=>${url}&&")
+                val res = twoConditionCombination(client,url,token,conditions,30)
+                println(s"&&3_20_u_res=>${res}&&")
                 res
             }
             val result = testUtil.listStrToStr(listStr,time_out)
@@ -230,7 +244,7 @@ class PICTestSpec extends Specification {
             val lists = List(atc_three)
             val date = testUtil.timeArrInstance(endYear,endMonth,"month",gap)
             val conditions = testUtil.getConditions(lists,date)
-            val resList = new PICClient(client, "http://127.0.0.1:9000").conditionSearchResult(token, conditions, skip, contains)
+            val resList = new PICClient(client, "http://127.0.0.1:8888").conditionSearchResult(token, conditions, skip, contains)
             val result = testUtil.listFutureToString(resList,time_out)
             result must_== "ok"
         }
@@ -243,7 +257,9 @@ class PICTestSpec extends Specification {
         val date = testUtil.timeArrInstance(endYear,endMonth,"year",gap)
         val conditions = testUtil.getConditions(lists,date)
         val listStr = urlList.map{ url =>
-            val res = twoConditionCombination(client,url,token,conditions,time_out)
+            println(s"&&3_21_url=>${url}&&")
+            val res = twoConditionCombination(client,url,token,conditions,60)
+            println(s"&&3_21_u_res=>${res}&&")
             res
         }
         val result = testUtil.listStrToStr(listStr,time_out)
@@ -256,7 +272,7 @@ class PICTestSpec extends Specification {
         val date = testUtil.timeArrInstance(endYear,endMonth,"year",gap)
         val conditions = testUtil.getConditions(lists,date)
 
-        val resList = new PICClient(client, "http://127.0.0.1:9000").conditionSearchResult(token, conditions, skip, contains)
+        val resList = new PICClient(client, "http://127.0.0.1:8888").conditionSearchResult(token, conditions, skip, contains)
 
         val result = testUtil.listFutureToString(resList,time_out)
 
@@ -268,7 +284,9 @@ class PICTestSpec extends Specification {
         val date = testUtil.timeArrInstance(endYear,endMonth,"month",gap)
         val conditions = testUtil.getConditions(lists,date)
         val listStr = urlList.map{ url =>
-            val res = twoConditionCombination(client,url,token,conditions,time_out)
+            println(s"&&3_22_url=>${url}&&")
+            val res = twoConditionCombination(client,url,token,conditions,60)
+            println(s"&&3_22_u_res=>${res}&&")
             res
         }
         val result = testUtil.listStrToStr(listStr,time_out)
@@ -281,7 +299,7 @@ class PICTestSpec extends Specification {
         val date = testUtil.timeArrInstance(endYear,endMonth,"month",gap)
         val conditions = testUtil.getConditions(lists,date)
 
-        val resList = new PICClient(client, "http://127.0.0.1:9000").conditionSearchResult(token, conditions, skip, contains)
+        val resList = new PICClient(client, "http://127.0.0.1:8888").conditionSearchResult(token, conditions, skip, contains)
 
         val result = testUtil.listFutureToString(resList,time_out)
 
@@ -294,7 +312,9 @@ class PICTestSpec extends Specification {
         val date = testUtil.timeArrInstance(endYear,endMonth,"year",gap)
         val conditions = testUtil.getConditions(lists,date)
         val listStr = urlList.map{ url =>
-            val res = twoConditionCombination(client,url,token,conditions,time_out)
+            println(s"&&3_23_url=>${url}&&")
+            val res = twoConditionCombination(client,url,token,conditions,60)
+            println(s"&&3_23_u_res=>${res}&&")
             res
         }
         val result = testUtil.listStrToStr(listStr,time_out)
@@ -307,7 +327,7 @@ class PICTestSpec extends Specification {
         val date = testUtil.timeArrInstance(endYear,endMonth,"year",gap)
         val conditions = testUtil.getConditions(lists,date)
 
-        val resList = new PICClient(client, "http://127.0.0.1:9000").conditionSearchResult(token, conditions, skip, contains)
+        val resList = new PICClient(client, "http://127.0.0.1:8888").conditionSearchResult(token, conditions, skip, contains)
 
         val result = testUtil.listFutureToString(resList,time_out)
 
@@ -320,7 +340,9 @@ class PICTestSpec extends Specification {
         val date = testUtil.timeArrInstance(endYear,endMonth,"month",gap)
         val conditions = testUtil.getConditions(lists,date)
         val listStr = urlList.map{ url =>
-            val res = twoConditionCombination(client,url,token,conditions,time_out)
+            println(s"&&3_24_url=>${url}&&")
+            val res = twoConditionCombination(client,url,token,conditions,60)
+            println(s"&&3_24_u_res=>${res}&&")
             res
         }
         val result = testUtil.listStrToStr(listStr,time_out)
@@ -333,7 +355,7 @@ class PICTestSpec extends Specification {
         val date = testUtil.timeArrInstance(endYear,endMonth,"month",gap)
         val conditions = testUtil.getConditions(lists,date)
 
-        val resList = new PICClient(client, "http://127.0.0.1:9000").conditionSearchResult(token, conditions, skip, contains)
+        val resList = new PICClient(client, "http://127.0.0.1:8888").conditionSearchResult(token, conditions, skip, contains)
 
         val result = testUtil.listFutureToString(resList,time_out)
 
@@ -346,7 +368,7 @@ class PICTestSpec extends Specification {
         val date = testUtil.timeArrInstance(endYear,endMonth,"year",gap)
         val conditions = testUtil.getConditions(lists,date)
         val listStr = urlList.map{ url =>
-            val res = twoConditionCombination(client,url,token,conditions,time_out)
+            val res = twoConditionCombination(client,url,token,conditions,60)
             res
         }
         val result = testUtil.listStrToStr(listStr,time_out)
@@ -359,7 +381,7 @@ class PICTestSpec extends Specification {
         val date = testUtil.timeArrInstance(endYear,endMonth,"year",gap)
         val conditions = testUtil.getConditions(lists,date)
 
-        val resList = new PICClient(client, "http://127.0.0.1:9000").conditionSearchResult(token, conditions, skip, contains)
+        val resList = new PICClient(client, "http://127.0.0.1:8888").conditionSearchResult(token, conditions, skip, contains)
 
         val result = testUtil.listFutureToString(resList,time_out)
 
@@ -372,7 +394,7 @@ class PICTestSpec extends Specification {
         val date = testUtil.timeArrInstance(endYear,endMonth,"month",gap)
         val conditions = testUtil.getConditions(lists,date)
         val listStr = urlList.map{ url =>
-            val res = twoConditionCombination(client,url,token,conditions,time_out)
+            val res = twoConditionCombination(client,url,token,conditions,60)
             res
         }
         val result = testUtil.listStrToStr(listStr,time_out)
@@ -385,7 +407,7 @@ class PICTestSpec extends Specification {
         val date = testUtil.timeArrInstance(endYear,endMonth,"month",gap)
         val conditions = testUtil.getConditions(lists,date)
 
-        val resList = new PICClient(client, "http://127.0.0.1:9000").conditionSearchResult(token, conditions, skip, contains)
+        val resList = new PICClient(client, "http://127.0.0.1:8888").conditionSearchResult(token, conditions, skip, contains)
 
         val result = testUtil.listFutureToString(resList,time_out)
 
@@ -398,7 +420,7 @@ class PICTestSpec extends Specification {
         val date = testUtil.timeArrInstance(endYear,endMonth,"year",gap)
         val conditions = testUtil.getConditions(lists,date)
         val listStr = urlList.map{ url =>
-            val res = twoConditionCombination(client,url,token,conditions,time_out)
+            val res = twoConditionCombination(client,url,token,conditions,60)
             res
         }
         val result = testUtil.listStrToStr(listStr,time_out)
@@ -411,7 +433,7 @@ class PICTestSpec extends Specification {
         val date = testUtil.timeArrInstance(endYear,endMonth,"year",gap)
         val conditions = testUtil.getConditions(lists,date)
 
-        val resList = new PICClient(client, "http://127.0.0.1:9000").conditionSearchResult(token, conditions, skip, contains)
+        val resList = new PICClient(client, "http://127.0.0.1:8888").conditionSearchResult(token, conditions, skip, contains)
 
         val result = testUtil.listFutureToString(resList,time_out)
 
@@ -424,7 +446,7 @@ class PICTestSpec extends Specification {
         val date = testUtil.timeArrInstance(endYear,endMonth,"month",gap)
         val conditions = testUtil.getConditions(lists,date)
         val listStr = urlList.map{ url =>
-            val res = twoConditionCombination(client,url,token,conditions,time_out)
+            val res = twoConditionCombination(client,url,token,conditions,60)
             res
         }
         val result = testUtil.listStrToStr(listStr,time_out)
@@ -437,7 +459,7 @@ class PICTestSpec extends Specification {
         val date = testUtil.timeArrInstance(endYear,endMonth,"month",gap)
         val conditions = testUtil.getConditions(lists,date)
 
-        val resList = new PICClient(client, "http://127.0.0.1:9000").conditionSearchResult(token, conditions, skip, contains)
+        val resList = new PICClient(client, "http://127.0.0.1:8888").conditionSearchResult(token, conditions, skip, contains)
 
         val result = testUtil.listFutureToString(resList,time_out)
 
@@ -445,11 +467,16 @@ class PICTestSpec extends Specification {
     }
 
     def twoConditionCombination(client:WSClient,conditionSearchUrl:String,token:String,lists:List[Map[String,JsValue]] ,time_out:Int): String ={
+//        println(s"&&conditions.length=>${lists.length}&&")
         val resArr=lists.map{condition=>
+//            println(s"&&3_16_condition=>${condition}&&")
             val res=Await.result(
-                new PICClient(client, "http://127.0.0.1:9000").oneCondition(token,condition,conditionSearchUrl), 10.seconds)
+            new PICClient(client, "http://127.0.0.1:8888").oneCondition(token,condition,conditionSearchUrl), 60.seconds)
+//            println(s"&&3_16_c_res=>${res}&&")
             res
         }.toArray
+//        println(s"&&resArr.length=>${resArr.length}&&")
+//        resArr.foreach(x => println(s"结果：${x}"))
         testUtil.finalResult(resArr)
     }
 

@@ -79,12 +79,19 @@ object testUtil {
         arr.toList
     }
     def resultHandling(response:WSResponse,condition:Map[String,JsValue]): String ={
-        var info="Error!"
-        val res=(response.json \ "status").asOpt[String].get
+        var info = "Error!"
+        val res = (response.json \ "status").asOpt[String].get
         if(res=="ok"){
             info=res
         }else{
-            info+=condition.values.head.asOpt[String].get+""+(response.json \ "error" \ "message")+"\n"
+            val empty = (response.json \ "error").get.asOpt[Map[String,JsValue]].get.get("code").get.asOpt[Int].get
+            if (empty== -906){
+                println(s"--> No result Error! <-- With condition=${condition}")
+                info="ok"
+            }else{
+                info = info+"Condition:"+condition.head._2.asOpt[String].get+"\t"+condition.tail.head._2.asOpt[Map[String,String]].get.tail.head._2+"-"+
+                    condition.tail.head._2.asOpt[Map[String,String]].get.head._2+"\tError msg:"+(response.json \ "error" \ "message")+"\n"
+            }
         }
         info
     }
@@ -92,9 +99,7 @@ object testUtil {
         var info="ok"
         resArr.foreach{r=>
             if(r!="ok"){
-                info+=r
-            }else{
-                info="ok"
+                info = info.+(r)
             }
         }
         info
@@ -102,11 +107,15 @@ object testUtil {
 
     def getConditions(lists: List[Map[String,List[String]]],date : List[(String,JsValue)]) : List[Map[String,JsValue]] = {
         var conditions = listToMatrixJsMap(lists)
-        conditions = conditions.map(x => x.+(date.head._1 -> date.head._2))
+        var conditions_final : List[Map[String,JsValue]] = conditions.map(x => x.+(date.head._1 -> date.head._2))
+        var conditions_temp : List[Map[String,JsValue]] = Nil
         for (d <- date.tail){
-            conditions = conditions ::: conditions.map(x => x.+(d._1 -> d._2))
+            conditions_temp = conditions
+            conditions = conditions.map(x => x.+(d._1 -> d._2))
+            conditions_final = conditions_final:::conditions
+            conditions = conditions_temp
         }
-        conditions
+        conditions_final
     }
 
     def listToMatrixJsMap (lists: List[Map[String,List[String]]]) : List[Map[String,JsValue]] = {

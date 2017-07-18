@@ -77,7 +77,7 @@ object AuthModule extends ModuleTrait with AuthData {
 			else {
                 
                 val att = cm.modules.get.get("att").map (x => x.asInstanceOf[AuthTokenTrait]).getOrElse(throw new Exception("no encrypt impl"))
-                val reVal = result.get + ("expire_in" -> toJson(date + 60 * 60 * 1000 * 24))
+                val reVal = result.get + ("expire_in" -> toJson(date + 60 * 60 * 1000 * 24 * 10))//临时改为10天的token期限
                 val auth_token = att.encrypt2Token(toJson(reVal))
                 (Some(Map(
                     "auth_token" -> toJson(auth_token),
