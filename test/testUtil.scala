@@ -6,6 +6,9 @@ import play.api.libs.json.JsValue
 import play.api.libs.json.Json.toJson
 import play.api.libs.ws.{WSClient, WSResponse}
 
+import scala.concurrent.Await
+import scala.concurrent.duration._
+
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.concurrent.duration._
 import scala.collection.mutable.ArrayBuffer
@@ -21,7 +24,16 @@ object testUtil {
       * @param timeType 间隔方式：以年计=>"year";以月计=>"month"
       */
     def timeGenerator(endYear:Int=2016,endMonth:Int=12,timeType:String="year"): (String,JsValue)={
-
+    
+        var end :String=""
+        var start:String=""
+        if(timeType=="month") {
+                val sdf = new SimpleDateFormat("yyyyMM")
+                val cal = Calendar.getInstance()
+                cal.setTime(sdf.parse(endYear+""+endMonth))
+                end = sdf.format(cal.getTime)
+                cal.add(Calendar.MONTH,-1)
+                start = sdf.format(cal.getTime)
         var end :String=""
         var start:String=""
         if(timeType=="month") {
@@ -40,6 +52,9 @@ object testUtil {
             start = sdf.format(cal.getTime)
         }
         ("date",toJson(Map("start"->start, "end"->end)))
+        
+    }
+    def timeArrInstance(endYear:Int=2016,endMonth:Int=12,timeType:String="year",gap:Int=1): List[(String,JsValue)] ={
 
     }
     def timeArrInstance(endYear:Int,endMonth:Int,timeType:String,gap:Int): List[(String,JsValue)] ={
@@ -73,8 +88,17 @@ object testUtil {
                 val res=(v1,v2)
                 arr.append(res)
                 res
-            }
-
+            }  
+        }
+        arr.toList
+    }
+    def resultHandling(response:WSResponse,requestJs:JsValue): String ={
+        var info="Error!"
+        val res=(response.json \ "status").asOpt[String].get
+        if(res=="ok"){
+            info=res
+        }else{
+            info+=(requestJs \ "condition")+"->"+(response.json \ "error" \ "message")+"\n"
         }
         arr.toList
     }
@@ -96,6 +120,12 @@ object testUtil {
         info
     }
     def finalResult(resArr:Array[String]): String ={
+        var info=""
+        resArr.foreach{r=>
+            if(r!="ok"){
+                info+=r
+            }else{
+                info="ok"
         var info="ok"
         resArr.foreach{r=>
             if(r!="ok"){
@@ -104,6 +134,19 @@ object testUtil {
         }
         info
     }
+    
+
+    
+//    def resultHandling(resArr:Array[String]):String={
+//        var info="ok"
+//        resArr.foreach{r=>
+//            if(r!="ok"){
+//                info="Error"
+//            }
+//        }
+//        info
+//    }
+    
 
     def getConditions(lists: List[Map[String,List[String]]],date : List[(String,JsValue)]) : List[Map[String,JsValue]] = {
         var conditions = listToMatrixJsMap(lists)
@@ -180,5 +223,4 @@ object testUtil {
         }
         result
     }
-
 }
