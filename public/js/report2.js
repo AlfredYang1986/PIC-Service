@@ -13,11 +13,20 @@ $(function(){
         "reportid": md5report
     })
     ajaxData("/data/query/reportparameter", data, "POST", function(r){
-        window.console.log(r)
         if(r.status == "ok") {
-            $(".categoryclasstitle").text(" • " + r.parameter.condition.category);
-            $(".categoryclass").text(r.parameter.condition.category);
-            $(".biaoti").text(r.parameter.condition.category)
+            if (r.parameter.condition.product_name != undefined){
+                $(".categoryclasstitle").text(" • " + r.parameter.condition.product_name);
+                $(".categoryclass").text(r.parameter.condition.product_name);
+                $(".biaoti").text(r.parameter.condition.product_name)
+            }else if (r.parameter.condition.oral_name != undefined){
+                $(".categoryclasstitle").text(" • " + r.parameter.condition.oral_name);
+                $(".categoryclass").text(r.parameter.condition.oral_name);
+                $(".biaoti").text(r.parameter.condition.oral_name)
+            }else {
+                $(".categoryclasstitle").text(" • " + r.parameter.condition.category);
+                $(".categoryclass").text(r.parameter.condition.category);
+                $(".biaoti").text(r.parameter.condition.category)
+            }
             reportajax($.extend(r.parameter, {"token": $.cookie("token")}))
         }
     }, function(e){console.error(e)})
@@ -34,7 +43,9 @@ var reportajax = function(data) {
         reportgrapheight(r2.reportgrapheight)
         reportgraphsix(r2.reportgraphsix)
         // reportTableOne(r2.ReportTableOne)
-        // console.info(r2)
+        if (r2 != undefined){
+            $("#loading").fadeOut("slow");
+        }
     }, function(e2){console.error(e2)})
 }
 var reportTableOne=function (obj) {

@@ -49,8 +49,7 @@ class PICTestSpec extends Specification with BeforeAll{
     val trendUrl :String = "/data/calc/trend"
     val quantityUrl :String = "/data/calc/quantity"
     val percentageUrl :String = "/data/calc/percentage"
-//    val urlList : List[String] = List(marketUrl,trendUrl,quantityUrl)
-    val urlList : List[String] = List(marketUrl)
+    val urlList : List[String] = List(marketUrl,trendUrl,quantityUrl)
 
     var atc_one :Map[String,List[String]]= null
     var atc_two :Map[String,List[String]]= null
