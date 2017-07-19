@@ -1,7 +1,40 @@
 /**
  * Created by yym on 7/3/17.
  */
+var c = null
 
+var searchValue = null
+var searchTime = null
+
+/**
+ * 重置按钮
+ */
+var resetSearch = function () {
+
+    atc1=""
+    atc2=""
+    atc3=""
+    oral_name=""
+    product_name=""
+    edge=""
+    manufacture_type=""
+    manufacture_name=""
+    product_type=""
+    specifications=""
+    pac=""
+
+    $(".selectInfo").remove("div")
+    $("#yearInputb").val("")
+    $("#monthInputb").val("")
+    $("#guim").text("X")
+    $('#zengzl').text("X");
+    $("#fene").text("X")
+    $("#chanps").text("X")
+    var arr = Object.keys(getSearchValue())
+    arr.forEach(function (x) {
+        console.log(x)
+    })
+}
 
 var userName = "";
 try {
@@ -9,7 +42,7 @@ try {
 }catch(ex) {
     console.info(ex)
 }
-var searchCount = 0;
+
 $('.timepk_year').datetimepicker({
     language: 'zh-CN', format: "yyyy", weekStart: 1,
     todayBtn: true, autoclose: true, todayHighlight: 1,
@@ -213,7 +246,9 @@ $(document).ready(function () {
 
 //选项框控制
 function showDig() {
-    var c = $.extend(getSearchValue(), getTime())
+    searchValue = getSearchValue()
+    searchTime = getTime()
+    c = $.extend(searchValue, searchTime)
     var arr = Object.keys(c)
     if(arr.length == 0){
         alert("请至少在左边栏选择一个条件进行搜索！")
@@ -226,6 +261,8 @@ function showDig() {
         showDataList()
         showDataGather()
     }
+    searchValue = null
+    searchTime = null
 }
 //----------------------------------------------------登录信息--------------------------------
 $("#userInfo").click(function () {

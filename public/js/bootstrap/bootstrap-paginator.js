@@ -431,7 +431,7 @@
 
         setCurrentPage: function (page) {
             if (page > this.totalPages || page < 1) {// if the current page is out of range, throw exception.
-
+                hasResult = false
                 throw "Page out of range";
 
             }
