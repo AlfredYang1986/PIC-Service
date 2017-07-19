@@ -6,10 +6,11 @@ import bmlogic.category.CategoryModule
 import play.api.libs.json.JsValue
 
 import scala.collection.immutable.Map
+import scala.util.Random
 /**
   * Created by yym on 7/12/17.
   */
-object ConditionUtil{
+object ConditionUtil {
     //改错 atc_two
     def chooseCondition(condition_name:String): Map[String,List[String]]={
         val tmp=toJson(Map(""->""))
@@ -72,11 +73,15 @@ object ConditionUtil{
     }
     def getConditions(lists: List[Map[String,List[String]]],date : List[(String,JsValue)]) : List[Map[String,JsValue]] = {
         var conditions = listToMatrixJsMap(lists)
-        conditions = conditions.map(x => x.+(date.head._1 -> date.head._2))
+        var conditions_final : List[Map[String,JsValue]] = conditions.map(x => x.+(date.head._1 -> date.head._2))
+        var conditions_temp : List[Map[String,JsValue]] = Nil
         for (d <- date.tail){
-            conditions = conditions ::: conditions.map(x => x.+(d._1 -> d._2))
+            conditions_temp = conditions
+            conditions = conditions.map(x => x.+(d._1 -> d._2))
+            conditions_final = conditions_final:::conditions
+            conditions = conditions_temp
         }
-        conditions
+        conditions_final
     }
     
     /**
@@ -94,10 +99,81 @@ object ConditionUtil{
         val res=chooseCondition(condition_one)::chooseCondition(condition_two)::Nil
         getConditions(res,date)
     }
-    def three_condition_with_time(condition_one:String,condition_two:String,condition_three:String,date : List[(String,JsValue)]): List[Map[String,JsValue]] ={
-        val res=chooseCondition(condition_one)::chooseCondition(condition_two)::Nil
-        getConditions(res,date)
+
+    /**
+      * @define three_condition_with_year 控制conditions返回条数为1000+
+      * @define three_condition_with_month 控制conditions返回条数为1000+
+      * @define four_condition_with_year 控制conditions返回条数为1000+
+      * @define four_condition_with_month 控制conditions返回条数为1000+
+      */
+    def three_condition_with_year(condition_one:String,condition_two:String,condition_three:String,date : List[(String,JsValue)]): List[Map[String,JsValue]] ={
+        val res=chooseCondition(condition_one)::chooseCondition(condition_two)::chooseCondition(condition_three)::Nil
+        val result = getConditions(res,date)
+        val length : Int = result.length
+        println(s"&&&&length&&&&=>${length}")
+        val new_length : Int = length/10
+        println(s"&&&&new_length&&&&=>${new_length}")
+        var final_result : List[Map[String,JsValue]] = Nil
+        for (i <- 1 to new_length){
+            final_result = result(Random.nextInt(10)+(i-1)*10) :: final_result
+        }
+        println(s"&&&&final_result.length&&&&=>${final_result.length}")
+        final_result
     }
-  
-    
+    def three_condition_with_month(condition_one:String,condition_two:String,condition_three:String,date : List[(String,JsValue)]): List[Map[String,JsValue]] ={
+        val res=chooseCondition(condition_one)::chooseCondition(condition_two)::chooseCondition(condition_three)::Nil
+        val result = getConditions(res,date)
+        val length : Int = result.length
+        println(s"&&&&length&&&&=>${length}")
+        val new_length : Int = length/70
+        println(s"&&&&new_length&&&&=>${new_length}")
+        var final_result : List[Map[String,JsValue]] = Nil
+        for (i <- 1 to new_length){
+            println(s"${i}->\t${result(Random.nextInt(70)+(i-1)*70)}")
+            final_result = result(Random.nextInt(70)+(i-1)*70) :: final_result
+            println(final_result.length)
+        }
+        println(s"&&&&final_result.length&&&&=>${final_result.length}")
+        final_result
+    }
+    def four_condition_with_year(condition_one:String,condition_two:String,condition_three:String,condition_four:String,date : List[(String,JsValue)]): List[Map[String,JsValue]] ={
+        val res=chooseCondition(condition_one)::chooseCondition(condition_two)::chooseCondition(condition_three)::chooseCondition(condition_four)::Nil
+        val result = getConditions(res,date)
+        val length : Int = result.length
+        println(s"&&&&length&&&&=>${length}")
+        val new_length : Int = length/800
+        println(s"&&&&new_length&&&&=>${new_length}")
+        var final_result : List[Map[String,JsValue]] = Nil
+        for (i <- 1 to new_length){
+            println(s"${i}->\t${result(Random.nextInt(800)+(i-1)*800)}")
+            final_result = result(Random.nextInt(800)+(i-1)*800) :: final_result
+            println(final_result.length)
+        }
+        println(s"&&&&final_result.length&&&&=>${final_result.length}")
+        final_result
+    }
+    def four_condition_with_month(condition_one:String,condition_two:String,condition_three:String,condition_four:String,date : List[(String,JsValue)]): List[Map[String,JsValue]] ={
+
+        val lists=chooseCondition(condition_one)::chooseCondition(condition_two)::chooseCondition(condition_three)::chooseCondition(condition_four)::Nil
+
+        val conditions = listToMatrixJsMap(lists)
+
+        val length : Int = conditions.length
+        val new_length : Int = length/5000
+        var final_result : List[Map[String,JsValue]] = Nil
+        for (i <- 1 to new_length){
+            final_result = conditions(Random.nextInt(5000)+(i-1)*5000) :: final_result
+        }
+
+        var conditions_final : List[Map[String,JsValue]] = final_result.map(x => x.+(date.head._1 -> date.head._2))
+        var conditions_temp : List[Map[String,JsValue]] = Nil
+        for (d <- date.tail){
+            conditions_temp = final_result
+            final_result = final_result.map(x => x.+(d._1 -> d._2))
+            conditions_final = conditions_final:::final_result
+            final_result = conditions_temp
+        }
+        conditions_final
+    }
+
 }

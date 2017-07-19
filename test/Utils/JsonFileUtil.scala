@@ -18,11 +18,11 @@ object JsonFileUtil {
     /**
       *
       * @param lsts 参考ConditionUtil 中函数返回值
-      * @param conditionNum 字母+条件数=>生成Json文件名（eg:"condiition2"）
+      * @param conditionNum 字母+条件数=>生成Json文件名（eg:"condition2"）
       * @param flag 是否不覆盖文件： true=>不覆盖 ，false=>覆盖
       */
     def writeJson(lsts:List[(String,List[Map[String,JsValue]])],conditionNum:String,flag:Boolean): Unit ={
-        val file  = new File(".")
+        val file  = new File("")
         val absolutePath = file.getAbsolutePath()
         val filePath:String=absolutePath+"//test//JsonFile//"+conditionNum+".txt"
         val out=new FileOutputStream(filePath,flag)
@@ -51,7 +51,7 @@ object JsonFileUtil {
       * @return
       */
     def readJson(conditionNum:String,test_case:String): List[Map[String,JsValue]] = {
-        val file = new File(".")
+        val file = new File("")
         val absolutePath = file.getAbsolutePath()
         val filePath = absolutePath + "//test//JsonFile//" + conditionNum + ".txt"
         val lines = Source.fromFile(filePath).getLines()

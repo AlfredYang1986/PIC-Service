@@ -32,7 +32,7 @@ object TestCondition {
             case 2 =>
                 c = ConditionUtil.two_condition_with_time(condition(0), condition(1), time)
             case 3 =>
-                c = ConditionUtil.three_condition_with_time(condition(0), condition(1), condition(2), time)
+                c = ConditionUtil.three_condition_with_year(condition(0), condition(1), condition(2), time)
     
         }
         c
