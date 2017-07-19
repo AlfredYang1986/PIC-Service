@@ -1,32 +1,8 @@
 /**
  * Created by qianpeng on 2017/6/15.
  */
-
-/**
- * 重置按钮
- */
-var reset=function () {
-    var atc1=""
-    var atc2=""
-    var atc3=""
-    var oral_name=""
-    var product_name=""
-    var edge=""
-    var manufacture_type=""
-    var manufacture_name=""
-    var product_type=""
-    var specifications=""
-    var pac=""
-    $(".selectInfo").remove("div")
-    $("#yearInputb").val("")
-    $("#monthInputb").val("")
-    $("#guim").text("X")
-    $('#zengzl').text("X");
-    $("#fene").text("X")
-    $("#chanps").text("X")
-
-
-}
+var searchCount = 0;
+var hasResult = false
 /**
  * 数据列表
  */
@@ -39,8 +15,9 @@ var showDataList = function() {
 var pageResult = function(skip) {
 
     searchCount++
+    console.log("17h->"+searchCount)
     $("#tbody").empty();
-    var c = $.extend(getSearchValue(), getTime())
+    c = $.extend(getSearchValue(), getTime())
     var data = JSON.stringify({
         "token": $.cookie("token"),
         "condition":{
@@ -59,6 +36,7 @@ var pageResult = function(skip) {
     });
     ajaxData("/data/search", data, "POST", function(r){
         if (r.status == "ok") {
+            hasResult = true;
             $("#tbody").empty();
             $("#pageview").show()
             $.each(r.search_result, function(i, v){
@@ -70,7 +48,7 @@ var pageResult = function(skip) {
             }
         }else{
             $("#xssj").attr({"class":"search-btn","onclick":"showDig()"})
-            $("#pageview").hide()
+            $("#pageview").hide();
             Page(null)
         }
         searchCount = 0
@@ -109,7 +87,7 @@ var getTime = function() {
  * 显示主页的四个小汇总
  */
 var showDataGather = function() {
-    var c = $.extend(getSearchValue(), getTime())
+    c = $.extend(getSearchValue(), getTime())
     var data = JSON.stringify({
         "token": $.cookie("token"),
         "condition":{
@@ -206,7 +184,7 @@ var productSize = function(data) {
 }
 
 var showData = function() {
-    var c = $.extend(getSearchValue(), getTime())
+    c = $.extend(getSearchValue(), getTime())
     var token = {"token": $.cookie("token")}
     var condition = {
         "condition": {
@@ -232,9 +210,12 @@ var showData = function() {
 
 
 var report = function() {
-    var c = $.extend(getSearchValue(), getTime())
+    c = $.extend(getSearchValue(), getTime())
     var result = showData()
-    if(result != ""&&c.date!=undefined){
+    console.log("213h->"+hasResult)
+    if(!hasResult){
+        alert("没有搜索数据！不能生成报告！")
+    } else if(result != ""&&c.date!=undefined){
         var w = window.open("")
         w.window.location = "/report"+result
     }else {
