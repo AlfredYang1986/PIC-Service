@@ -13,9 +13,7 @@ var showDataList = function() {
 }
 
 var pageResult = function(skip) {
-
     searchCount++
-    console.log("17h->"+searchCount)
     $("#tbody").empty();
     c = $.extend(getSearchValue(), getTime())
     var data = JSON.stringify({
@@ -212,7 +210,6 @@ var showData = function() {
 var report = function() {
     c = $.extend(getSearchValue(), getTime())
     var result = showData()
-    console.log("213h->"+hasResult)
     if(!hasResult){
         alert("没有搜索数据！不能生成报告！")
     } else if(result != ""&&c.date!=undefined){
