@@ -431,7 +431,8 @@
 
         setCurrentPage: function (page) {
             if (page > this.totalPages || page < 1) {// if the current page is out of range, throw exception.
-                hasResult = false
+                hasResult = false;
+                $("#pageview").hide();
                 throw "Page out of range";
 
             }
