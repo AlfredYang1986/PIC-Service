@@ -13,7 +13,7 @@ import play.api.libs.json.JsValue
   */
 trait ConditionSearchFunc {
     val sdf = new SimpleDateFormat("yyyyMM")
-    
+
     def timeList(n: Int = 0, data: JsValue): List[String] = {
         val start = (data \ "condition" \ "date" \ "start").get.as[String]
         val end = (data \ "condition" \ "date" \ "end").get.as[String]

@@ -3,6 +3,47 @@
  */
 var searchCount = 0;
 var hasResult = false
+
+/**
+ * 重置按钮
+ */
+var reset=function () {
+    atc1=""
+    atc2=""
+    atc3=""
+    oral_name=""
+    product_name=""
+    edge=""
+    manufacture_type=""
+    manufacture_name=""
+    product_type=""
+    specifications=""
+    pac=""
+    $(".selectInfo").remove("div")
+    $(".leftMenu").find("li").remove("li")
+    $("#yearInputb").val("")
+    $("#monthInputb").val("")
+    $("#guim").text("")
+    $('#zengzl').text("")
+    $("#fene").text("")
+    $("#chanps").text("")
+    $("#atc1_input").val("")
+    $("#atc2_input").val("")
+    $("#atc3_input").val("")
+    $("#oral_name_input").val("")
+    $("#product_name_input").val("")
+    $("#package_input").val("")
+    $("#specifications_input").val("")
+    $("#manufacture_name_input").val("")
+    $("#product_type_input").val("")
+    $("#province_input").val("")
+    $("#manufacture_type_input").val("")
+    showSomeNav()
+    showOtherNav()
+    $(".dataTable").hide();
+    $(".img").show();
+
+}
 /**
  * 数据列表
  */
@@ -182,7 +223,8 @@ var productSize = function(data) {
 }
 
 var showData = function() {
-    c = $.extend(getSearchValue(), getTime())
+
+    var c = $.extend(getSearchValue(), getTime())
     var token = {"token": $.cookie("token")}
     var condition = {
         "condition": {
@@ -204,7 +246,6 @@ var showData = function() {
     }
     return reportid
 }
-
 
 
 var report = function() {

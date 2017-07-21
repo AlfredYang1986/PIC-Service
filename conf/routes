@@ -70,6 +70,7 @@ GET     /userInfo                               controllers.PagesController.user
 #左侧下拉选项数据
 POST    /showConfig                             controllers.ConfigController.showConfig
 POST    /category                               controllers.CategoryController.category
+POST    /categoryLinkage                        controllers.CategoryController.categoryLinkage
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               			controllers.Assets.at(path="/public", file)
