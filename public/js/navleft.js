@@ -109,7 +109,7 @@ var showAtcInfo = function() {
                 leftInitial("atc1", "category", data.result.atc_one,atc1)
                 leftInitial("atc2", "category", data.result.atc_tow,atc2)
                 leftInitial("atc3", "category", data.result.atc_three,atc3)
-                leftInitial("genericnameinfo", "oral_name", data.result.oral,oral_name)
+                leftInitial("genericnameinfo", "oral_name", data.result.oral_name,oral_name)
                 leftInitial("product", "product_name", data.result.product,product_name)
             }
         }
