@@ -113,7 +113,6 @@ object CategoryModule extends ModuleTrait with CategoryData {
             val des=(data \ "des").get.as[String]
             val result=level match {
                  case "0" =>
-                     println("0")
                     val atc_one=des
                     val children_one=findChildren(category
                         .filter(x => x.get("des").get.as[String]==des).distinct)
@@ -129,7 +128,6 @@ object CategoryModule extends ModuleTrait with CategoryData {
                         "oral_name" -> toJson(oral_name),
                         "product" -> toJson(product)))
                  case "1" =>
-                     println("1")
                      val atc_two=des
                      val atc_one=findParent(atc_two)
                      val children_two=findChildren(category.filter(x => x.get("des").get.as[String] == des).distinct)
@@ -143,7 +141,6 @@ object CategoryModule extends ModuleTrait with CategoryData {
                          "oral_name" -> toJson(oral_name),
                          "product" -> toJson(product)))
                  case "2" =>
-                     println("2")
                      val atc_three=des
                      val atc_two=findParent(atc_three)
                      val atc_one=findParent(atc_two)
@@ -156,13 +153,9 @@ object CategoryModule extends ModuleTrait with CategoryData {
                          "oral_name" -> toJson(oral_name),
                          "product" -> toJson(product)))
                  case "3" =>
-                     println("3")
-                     println(des)
                      val oral_name=des
                      val three=category.filter(x => x.get("des").get.as[String]==des).distinct
-                     println(three)
                      val product=three.map(x=>x.get("def").get.as[String])
-                     println(product)
                      val atc_three=findOtherParent(oral_name)
                      val atc_two=findParent(atc_three)
                      val atc_one=findParent(atc_two)
@@ -172,7 +165,6 @@ object CategoryModule extends ModuleTrait with CategoryData {
                          "oral_name" -> toJson(List(oral_name)),
                          "product" -> toJson(product)))
                  case "4" =>
-                     println("4")
                      val product=des
                      val three=category.filter(x => x.get("def").get.as[String]==des).distinct
                      val oral_name=three.head.get("des").get.as[String]

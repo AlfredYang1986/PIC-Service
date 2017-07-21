@@ -96,6 +96,9 @@ ul,li{margin:0;padding:0}
     color:rgb(28,175,154);
     padding-left: 45px;
     padding-top: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 .downLi:hover{
     background-color: rgb(239,243,243);
@@ -194,19 +197,10 @@ ul,li{margin:0;padding:0}
     top: 0px;
 
 }
-/*.subMenu{*/
-/*position: absolute;*/
-/*top:100%;*/
-/*left:0;*/
-/*z-index: 1000;*/
-/*float: left;*/
-/*padding: 5px 0;*/
-/*font-size: 12px;*/
-/*-webkit-border-radius:4px;*/
-/*-moz-border-radius:4px;*/
-/*border-radius:4px;*/
-/*overflow-y: scroll;*/
-/*}*/
+.subMenu{
+    height: 150px;
+    overflow-y: scroll;
+}
 :-moz-placeholder { /* Mozilla Firefox 4 to 18 */
     color: #edf6ff;
     opacity:1;

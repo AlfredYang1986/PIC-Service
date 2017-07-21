@@ -51,7 +51,6 @@ object RetrievalModule extends ModuleTrait with RetrievalData with ConditionSear
                        (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
         import bmutil.alDateOpt._
         try {
-            println(data)
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
             
             val condition = (conditionParse(data, pr.get) :: dateConditionParse(data) ::
