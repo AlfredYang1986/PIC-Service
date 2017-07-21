@@ -55,45 +55,50 @@ object RetrievalModule extends ModuleTrait with RetrievalData with ConditionSear
             
             val condition = (conditionParse(data, pr.get) :: dateConditionParse(data) ::
                              oralNameConditionParse(data) :: productNameConditionParse(data) :: Nil).filterNot(_ == None).map(_.get)
-            
-            val count = if(!condition.isEmpty) {
-                val group = MongoDBObject("_id" -> MongoDBObject("ms" -> "count"), "count" -> MongoDBObject("$sum" -> 1))
-                db.aggregate($and(condition), "retrieval", group){ x =>
-                    Map("count" -> toJson(aggregateSalesResult(x, "count")))
+            if (pr.get.filterKeys(x => x=="Warning").isEmpty){
+                val count = if(!condition.isEmpty) {
+                    val group = MongoDBObject("_id" -> MongoDBObject("ms" -> "count"), "count" -> MongoDBObject("$sum" -> 1))
+                    db.aggregate($and(condition), "retrieval", group){ x =>
+                        Map("count" -> toJson(aggregateSalesResult(x, "count")))
+                    }
+                }else {
+                    Some(Map("count" -> toJson(0)))
                 }
+
+                var index = 1
+                val skip = (data \ "skip").asOpt[Int].getOrElse(1)
+                val r = db.queryMultipleObject($and(condition), "retrieval", skip = skip, take = TAKE).map { x =>
+                    lazy val atc = searchatc(x.get("category").get.asOpt[String].getOrElse(throw new Exception("input error")))(Some(Nil)).map(x => x).getOrElse(throw new Exception)
+                    val html =
+                        s"""<tr>
+                           |     <td>$index</td>
+                           |     <td>${Timestamp2yyyyMM(x.get("date").get.as[Long])}</td>
+                           |     <td>${x.get("province").get.as[String]}</td>
+                           |     <td>${x.get("product_name").get.as[String]}</td>
+                           |     <td>${x.get("sales").get.as[Long]}</td>
+                           |     <td>${x.get("units").get.as[Long]}</td>
+                           |     <td>${x.get("oral_name").get.as[String]}</td>
+                           |     <td>${x.get("manufacture").get.as[String]}</td>
+                           |     <td>${x.get("specifications").get.as[String]}</td>
+                           |     <td>${atc.head.get("des").get.as[String]}</td>
+                           |     <td>${atc.tail.head.get("des").get.as[String]}</td>
+                           |     <td>${x.get("category").get.as[String]}</td>
+                           |     <td>${x.get("product_unit").get.as[String]}</td>
+                           |     <td>${x.get("manufacture_type").get.as[String]}</td>
+                           |     <td>${x.get("product_type").get.as[String]}</td>
+                           |     <td>${x.get("package").get.as[String]}</td>
+                           |  </tr>""".stripMargin
+                    index += 1
+                    Map("html" -> html)
+                }
+
+                val result = Map("search_result" -> toJson(r), "page" -> toJson(Page(skip, count.get.get("count").get.as[Long])))
+                (Some(result), None)
             }else {
-                Some(Map("count" -> toJson(0)))
+                val result = Map("search_result" -> toJson(""), "page" -> toJson(""))
+                (Some(result), None)
             }
-            
-            var index = 1
-            val skip = (data \ "skip").asOpt[Int].getOrElse(1)
-            val r = db.queryMultipleObject($and(condition), "retrieval", skip = skip, take = TAKE).map { x =>
-                lazy val atc = searchatc(x.get("category").get.asOpt[String].getOrElse(throw new Exception("input error")))(Some(Nil)).map(x => x).getOrElse(throw new Exception)
-                val html =
-					s"""<tr>
-                      |     <td>$index</td>
-                      |     <td>${Timestamp2yyyyMM(x.get("date").get.as[Long])}</td>
-                      |     <td>${x.get("province").get.as[String]}</td>
-                      |     <td>${x.get("product_name").get.as[String]}</td>
-                      |     <td>${x.get("sales").get.as[Long]}</td>
-                      |     <td>${x.get("units").get.as[Long]}</td>
-                      |     <td>${x.get("oral_name").get.as[String]}</td>
-                      |     <td>${x.get("manufacture").get.as[String]}</td>
-                      |     <td>${x.get("specifications").get.as[String]}</td>
-                      |     <td>${atc.head.get("des").get.as[String]}</td>
-                      |     <td>${atc.tail.head.get("des").get.as[String]}</td>
-                      |     <td>${x.get("category").get.as[String]}</td>
-                      |     <td>${x.get("product_unit").get.as[String]}</td>
-                      |     <td>${x.get("manufacture_type").get.as[String]}</td>
-                      |     <td>${x.get("product_type").get.as[String]}</td>
-                      |     <td>${x.get("package").get.as[String]}</td>
-                      |  </tr>""".stripMargin
-                index += 1
-                Map("html" -> html)
-            }
-            
-            val result = Map("search_result" -> toJson(r), "page" -> toJson(Page(skip, count.get.get("count").get.as[Long])))
-            (Some(result), None)
+
         } catch {
             case ex : Exception =>
                 (None, Some(ErrorCode.errorToJson(ex.getMessage)))
