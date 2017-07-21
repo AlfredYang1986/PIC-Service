@@ -45,6 +45,7 @@
                             <div class="row">
                                 <label>查询权限：</label>
                                 <p><label>类型：</label><span class="category"></span></p>
+                                <p><label>是否显示样本数据：</label><span class="sample"></span></p>
                                 <p><label>区域：</label><span class="edge"></span></p>
                                 <p><label>厂家：</label><span class="manufacture_name"></span></p>
                             </div>
@@ -76,6 +77,8 @@
                     var category_lst = r.result.auth.scope.category
                     var edge_lst = r.result.auth.scope.edge
                     var manufacture_lst = r.result.auth.scope.manufacture_name
+//                    var sample = r.result.auth.scope.sample
+                    var sample=1;
                     var category = "", edge = "", manufacture_name = "";
                     $.each(category_lst, function(i, v){
                         if(i % 2 == 0) {category = category + v } else {category = category + "、" + v}
@@ -86,6 +89,7 @@
                     $.each(manufacture_lst, function(i, v){
                         if(i % 2 == 0) {manufacture_name = manufacture_name + v } else {manufacture_name = manufacture_name + "、" + v}
                     })
+                    if(sample==0){$(".sample").text("否")}else{$(".sample").text("是")}
                     $(".category").text(category)
                     $(".edge").text(edge)
                     $(".manufacture_name").text(manufacture_name)
