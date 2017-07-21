@@ -91,11 +91,11 @@ object RetrievalModule extends ModuleTrait with RetrievalData with ConditionSear
                     index += 1
                     Map("html" -> html)
                 }
-
                 val result = Map("search_result" -> toJson(r), "page" -> toJson(Page(skip, count.get.get("count").get.as[Long])))
                 (Some(result), None)
             }else {
-                val result = Map("search_result" -> toJson(""), "page" -> toJson(""))
+                val emptyList : List[Map[String,String]] = List()
+                val result = Map("search_result" -> toJson(emptyList), "page" -> toJson(""))
                 (Some(result), None)
             }
 
