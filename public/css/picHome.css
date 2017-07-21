@@ -199,7 +199,7 @@ ul,li{margin:0;padding:0}
 }
 .subMenu{
     height: 150px;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 :-moz-placeholder { /* Mozilla Firefox 4 to 18 */
     color: #edf6ff;
