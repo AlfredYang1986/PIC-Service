@@ -50,6 +50,12 @@ trait AuthScope {
         val is_admin = scope.getAs[Number]("is_admin").map (x => x).getOrElse(throw new Exception("db prase error"))
         toJson(is_admin.intValue)
     }
+    
+    def querySampleScope(obj:MongoDBObject) : JsValue={
+        val scope = obj.getAs[MongoDBObject]("scope").map(x => x).getOrElse(throw new Exception("db scope prase error"))
+        val sample=scope.getAs[Int]("sample").map(x => x).getOrElse(throw  new Exception("db sample prase error"))
+        toJson(sample)
+    }
 
     def productLevel2Category(lst : List[String]) : List[String] = {
         val cat = (from db() in "config" where ("index" -> "PIC")

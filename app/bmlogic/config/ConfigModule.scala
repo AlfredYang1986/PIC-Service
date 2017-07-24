@@ -47,6 +47,8 @@ object ConfigModule extends ModuleTrait with ConfigData{
         val province = db.queryObject(DBObject(),"config").get.get("province").get.asOpt[List[JsValue]].get
 
         val level = category.groupBy(x => (x \ "level").get)
+        
+        val sample=List[JsValue](toJson("是") ,toJson( "否"))
 
         val atc_one = level.filter(x => x._1.as[Int]==0).map(x => x._2.map(x => (x \ "des").get)).head
         val atc_tow = level.filter(x => x._1.as[Int]==1).map(x => x._2.map(x => (x \ "des").get)).head
@@ -55,7 +57,9 @@ object ConfigModule extends ModuleTrait with ConfigData{
         var s_atc_one = "{id:\"1\",text:\"治疗类别I[搜索框]\",checked:\"true\",items:"+list2string(atc_one)+"},"
         var s_atc_two = "{id:\"2\",text:\"治疗类别II[搜索框]\",checked:\"true\",items:"+list2string(atc_tow)+"},"
         var s_atc_three = "{id:\"3\",text:\"治疗类别III[搜索框]\",checked:\"true\",items:"+list2string(atc_three)+"},"
-        var s_province = "{id:\"4\",text:\"区域[搜索框]\",checked:\"true\",items:"+list2string(province)+"}"
+        var s_province = "{id:\"4\",text:\"区域[搜索框]\",checked:\"true\",items:"+list2string(province)+"},"
+//        val s_sample =  "{id:\"5\",text:\"显示样本数据[搜索框]\",checked:\"true\",items:" + list2string(sample) +"}"
+        val s_sample = "{id:\"5\",text:\"显示样本报告\",checked:\"true\"}"
 
         val u_c_it = user_category.iterator
         val u_e_it = user_edge.iterator
@@ -79,9 +83,9 @@ object ConfigModule extends ModuleTrait with ConfigData{
                 s_province=s_province.replaceFirst(temp,temp+",checked:\"true\"")
             }
         }
-
-        val s_result = "["+s_atc_one+s_atc_two+s_atc_three+s_province+"]"
-
+    
+        val s_result = "["+s_atc_one+s_atc_two+s_atc_three+s_province+s_sample+"]"
+    
         (Some(Map(
             "result" -> toJson(s_result)
         )), None)

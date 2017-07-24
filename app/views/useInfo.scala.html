@@ -77,8 +77,8 @@
                     var category_lst = r.result.auth.scope.category
                     var edge_lst = r.result.auth.scope.edge
                     var manufacture_lst = r.result.auth.scope.manufacture_name
-//                    var sample = r.result.auth.scope.sample
-                    var sample=1;
+                    var sample = r.result.auth.scope.sample
+//                    var sample=1;
                     var category = "", edge = "", manufacture_name = "";
                     $.each(category_lst, function(i, v){
                         if(i % 2 == 0) {category = category + v } else {category = category + "、" + v}

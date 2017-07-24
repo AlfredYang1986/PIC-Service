@@ -28,6 +28,7 @@ trait AuthData extends AuthScope {
         scope_builder += "category" -> pushProduceLevelScope(js)
         scope_builder += "manufacture_name" -> pushManufactureNameScope(js)
         scope_builder += "is_admin" -> (js \ "scope" \ "is_admin").asOpt[Int].map (x => x).getOrElse(0)
+        scope_builder += "sample" ->(js \ "scope" \ "sample").asOpt[Int].map(x => x).getOrElse(0)
 
         build += "scope" -> scope_builder.result
 
@@ -45,13 +46,16 @@ trait AuthData extends AuthScope {
         build += "screen_photo" -> (js \ "screen_photo").asOpt[String].map (x => x).getOrElse("")
         build += "phoneNo" -> (js \ "phoneNo").asOpt[String].map (x => x).getOrElse("")
         build += "email" -> (js \ "email").asOpt[String].map (x => x).getOrElse("")
+        
+
 
         val scope_builder = MongoDBObject.newBuilder
         scope_builder += "edge" -> pushEdgeScope(js)
         scope_builder += "category" -> pushProduceLevelScope(js)
         scope_builder += "manufacture_name" -> pushManufactureNameScope(js)
         scope_builder += "is_admin" -> (js \ "scope" \ "is_admin").asOpt[Int].map (x => x).getOrElse(0)
-
+        scope_builder += "sample" ->(js \ "scope" \ "sample").asOpt[Int].map(x => x).getOrElse(0)
+        
         build += "scope" -> scope_builder.result
         build += "status" -> (js \ "status").asOpt[Int].map (x => x).getOrElse("")
 
@@ -74,7 +78,8 @@ trait AuthData extends AuthScope {
             "scope" -> toJson(Map("edge" -> queryEdgeScope(obj),
                                     "category" -> queryProductLevelScope(obj),
                                     "manufacture_name" -> queryManufactureNameScope(obj),
-                                    "is_admin" -> queryIsAdminScope(obj))),
+                                    "is_admin" -> queryIsAdminScope(obj),
+                                    "sample" -> querySampleScope(obj))),
             "screen_name" -> toJson(obj.getAs[String]("screen_name").map (x => x).getOrElse(throw new Exception("db prase error"))),
             "screen_photo" -> toJson(obj.getAs[String]("screen_photo").map (x => x).getOrElse(throw new Exception("db prase error"))),
             "date" -> toJson(obj.getAs[Number]("date").map (x => x.longValue).getOrElse(throw new Exception("db prase error"))),
