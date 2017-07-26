@@ -1,13 +1,13 @@
 package bmlogic.config
 
 import bminjection.db.DBTrait
+import bminjection.token.AuthTokenTrait
 import bmlogic.config.ConfigData.ConfigData
 import bmlogic.config.ConfigMessage.{msg_QueryInfoCommand, msg_queryAuthTree}
 import bmmessages.{CommonModules, MessageDefines}
 import bmpattern.ModuleTrait
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json.toJson
-
 import bmlogic.auth.AuthModule.queryUserById
 
 import scala.collection.immutable.Map
@@ -25,11 +25,28 @@ object ConfigModule extends ModuleTrait with ConfigData{
     }
 
     def infoQuery(data : JsValue)(implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
-        val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
-        val result = db.queryMultipleObject(DBObject("index" -> "PIC"), "config")
-        (Some(Map(
-            "info" -> toJson(result)
+        val db = cm.modules.get.get("db").map(x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+        var preRes = db.queryMultipleObject(DBObject("index" -> "PIC"), "config")
+        val token = (data \ "token").get.asOpt[String].map(x => x).getOrElse(throw new Exception("can't find token"))
+        val att = cm.modules.get.get("att").map(x => x.asInstanceOf[AuthTokenTrait]).getOrElse(throw new Exception("no encrypt impl"))
+        val auth = att.decrypt2JsValue(token)
+        val manufacture_name = (auth \ "scope" \ "manufacture_name").get.asOpt[List[String]].getOrElse(throw new Exception("prase error"))
+        val edge = (auth \ "scope" \ "edge").get.asOpt[List[String]].getOrElse(throw new Exception("prase error"))
+        if (!manufacture_name.isEmpty && edge.isEmpty) {
+            preRes =List( Map(("package" -> preRes.head.get("package").get),("specifications" -> preRes.head.get("specifications").get),
+                ("product_type" -> preRes.head.get("product_type").get),("province" ->toJson(edge)), ("manufacture" -> preRes.head.get("manufacture").get)))
+        }else if (!edge.isEmpty && manufacture_name.isEmpty) {
+            preRes =List( Map(("package" -> preRes.head.get("package").get),("specifications" -> preRes.head.get("specifications").get),
+                ("product_type" -> preRes.head.get("product_type").get),("province" -> preRes.head.get("province").get), ("manufacture" -> toJson(manufacture_name))))
+        }else if(!edge.isEmpty && !manufacture_name.isEmpty){
+            preRes =List( Map(("package" -> preRes.head.get("package").get),("specifications" -> preRes.head.get("specifications").get),
+                ("product_type" -> preRes.head.get("product_type").get),("province" ->toJson(edge)), ("manufacture" -> toJson(manufacture_name))))
+        }else{}
 
+        println(preRes)
+        (Some(Map(
+            "info" -> toJson(preRes)
+    
         )), None)
     }
 

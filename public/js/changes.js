@@ -45,12 +45,17 @@ $("document").ready(function () {
 });
 // 左导航
 var showSomeNav = function() {
+    var token= $.cookie("token")
+    var js={
+        "token" : token
+    }
     $.ajax({
         type: "POST",
         url: "/category",
-        data: JSON.stringify({}),
+        data: JSON.stringify(js),
         contentType: "application/json,charset=utf-8",
         success: function (data) {
+            console.log(data)
             if (data.status == "ok") {
                 leftInitial("atc1", "category", data.result.atc_one)
                 leftInitial("atc2", "category", data.result.atc_tow)
@@ -63,10 +68,14 @@ var showSomeNav = function() {
 
 }
 function showOtherNav() {
+    var token= $.cookie("token")
+    var js={
+        "token" : token
+    }
     $.ajax({
         type: "POST",
         url: "/showConfig",
-        data: JSON.stringify({}),
+        data: JSON.stringify(js),
         contentType: "application/json,charset=utf-8",
         success: function (data) {
             if (data.status == "ok") {
@@ -171,6 +180,7 @@ function reloadLeft(id,result,value) {
 }
 
 function searchClick(c,id,key){
+    var token=$.cookie("token")
     var value=c
     var buttonObj=$('#'+id+'_button')
     var inObj=$('#'+id+'_input')
@@ -184,6 +194,7 @@ function searchClick(c,id,key){
     var v=JSON.stringify(temp)
     if(id=="atc1") {
         var json={
+            "token":token,
             "level":"0",
             "des":value
         }
@@ -192,6 +203,7 @@ function searchClick(c,id,key){
         atc1 = JSON.parse(v)
     }else if(id=="atc2"){
         var json={
+            "token":token,
             "level":"1",
             "des":value
         }
@@ -199,6 +211,7 @@ function searchClick(c,id,key){
         atc2=JSON.parse(v)
     }else if(id=="atc3"){
         var json={
+            "token":token,
             "level":"2",
             "des":value
         }
@@ -221,6 +234,7 @@ function searchClick(c,id,key){
         }
     }else if(id=="oral_name"){
         var json={
+
             "level":"3",
             "des":value
         }
