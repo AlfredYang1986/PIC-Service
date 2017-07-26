@@ -42,6 +42,7 @@ $("document").ready(function () {
     $(".dataTable").hide()
     showSomeNav()
     showOtherNav()
+
 });
 // 左导航
 var showSomeNav = function() {
@@ -117,6 +118,9 @@ function leftInitial(id,key,res){
 function  buttonClick(buttonObj,id) {
     var divObj=$('#'+id+'_div')
     if(divObj.css("display")=="none"){
+        $(".subMenu").hide()
+        $(".aI").find("i").removeClass("glyphicon-menu-down")
+        $(".aI").find("i").addClass("glyphicon-menu-right")
         divObj.show()
         buttonObj.find("i").removeClass("glyphicon-menu-right")
         buttonObj.find("i").addClass("glyphicon-menu-down")
@@ -131,6 +135,9 @@ function inputClick(id) {
     var inputObj=$('#'+ id+'_input')
     var divObj=$('#'+id+'_div')
     var li=$("#"+id+"_ul").find("li")
+    $(".subMenu").hide()
+    $(".aI").find("i").removeClass("glyphicon-menu-down")
+    $(".aI").find("i").addClass("glyphicon-menu-right")
     divObj.show()
     buttonObj.find("i").removeClass("glyphicon-menu-right")
     buttonObj.find("i").addClass("glyphicon-menu-down")

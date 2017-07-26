@@ -35,7 +35,6 @@ object CategoryModule extends ModuleTrait with CategoryData {
 //        val manufacture_name = (auth \ "scope" \ "manufacture_name").get.asOpt[List[String]].getOrElse(throw  new Exception("prase error"))
 //        val edge = (auth \ "scope" \ "edge").get.asOpt[List[String]].getOrElse(throw  new Exception("prase error"))
         var cateRes=c.getOrElse(throw new Exception("have on data"))
-        println(categorys.length)
         if(categorys.length != 0){
             cateRes=categorys.map{x =>
                 val atc_three=x
@@ -54,7 +53,6 @@ object CategoryModule extends ModuleTrait with CategoryData {
  
     def Category(data: JsValue)(implicit cm : CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = {
         val fil=Option(categoryAuthFilter(data))
-        println(fil +"zczxc")
         val result =fil match {
             case None => None
             case Some(ca) =>
