@@ -6,10 +6,10 @@ import bmlogic.category.CategoryMessage._
 import bmmessages.{CommonModules, MessageDefines}
 import bmpattern.ModuleTrait
 import bmutil.errorcode.ErrorCode
-import com.mongodb.casbah.Imports._
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json.toJson
 import bminjection.db.LoadCategory._
+import bminjection.token.AuthTokenTrait
 
 import scala.collection.immutable.Map
 
@@ -21,74 +21,39 @@ object CategoryModule extends ModuleTrait with CategoryData {
     lazy val c = category
     
     def dispatchMsg(msg : MessageDefines)(pr : Option[Map[String, JsValue]])(implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = msg match {
-//        case msg_FirstChildCategoryCommand(data)=>FirstChildCategory(data)
-//        case msg_SecondChildCategoryCommand(data)=>SecondChildCategory(data)
-        //case  msg_ThridChildCategoryCommand(data)=>ThridChildCategory(data)
-
         case msg_Category(data) => Category(data)
         case msg_LinkageCategory(data)=>categoryLinkage(data)
         case _ => ???
     }
-    //查出治疗1中包含的治疗2
-//    def FirstChildCategory(data : JsValue)(implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) ={
-//        try {
-//            val db = cm.modules.get.get("db").map(x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
-//            val des=(data \ "fir_des").asOpt[String].get
-//            val parentList=db.queryMultipleObject(DBObject("des"->des),"category").map(x=> x.get("def"))
-//            var parent=""
-//            if(!parentList.isEmpty){
-//                parent=parentList.head.get.asOpt[String].get
-//            }
-//            val childList=db.queryMultipleObject(DBObject("parent"->parent),"category").map(x=>x.get("des").get)
-//
-//            (Some(Map(
-//                "sec_des" -> toJson(childList)
-//
-//            )), None)
-//
-//        }catch {
-//            case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
-//        }
-//    }
-    //查出治疗2中包含的治疗3
-//    def SecondChildCategory(data:JsValue)(implicit cm:CommonModules):(Option[Map[String,JsValue]],Option[JsValue])={
-//       try{
-//           val db=cm.modules.get.get("db").map(x=>x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
-//           val desList=(data\"sec_des").asOpt[List[String]].get.map(x=>Map("des"->toJson(x)))
-//           val parentList=db.queryMultipleObject($or(desList.map(x=>DBObject("des"->x.get("des").get.toString()))),"category").map(x=>x.get("def"))
-//           val childList=db.queryMultipleObject($or(parentList.map(x=>DBObject("def"->x.get.toString()))),"category").map(x=>x.get("des").get)
-//           (Some(Map(
-//               "thr_des" -> toJson(childList)
-//           )), None)
-//
-//
-//       }catch {
-//           case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
-//       }
-//
-//    }
-    //查出治疗3的产品数量
-//    def ThridChildCategory(data:JsValue)(implicit cm:CommonModules):(Option[Map[String,JsValue]],Option[JsValue])={
-//        try{
-//            val db=cm.modules.get.get("db").map(x=>x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
-//            val desList=(data\"thr_des").asOpt[List[String]].get.map(x=>Map("des"->toJson(x)))
-//            val categoryList=db.queryMultipleObject($or(desList.map(x=>DBObject("category"->x.get("des").get.toString()))),"retrieval")
-//
-//            val sum=categoryList.size
-//            (Some(Map(
-//                "thr_des" -> toJson(sum)
-//            )), None)
-//
-//
-//        }catch {
-//            case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
-//        }
-        
- //   }
+
+    //根据用户权限 过滤可查询字段
+    def categoryAuthFilter(data : JsValue)(implicit cm : CommonModules):List[Map[String, JsValue]]={
+        val token = (data \ "token").get.asOpt[String].map(x => x).getOrElse(throw new Exception("can't find token"))
+        val att = cm.modules.get.get("att").map (x => x.asInstanceOf[AuthTokenTrait]).getOrElse(throw new Exception("no encrypt impl"))
+        val auth=att.decrypt2JsValue(token)
+        val categorys = (auth \ "scope" \ "category").get.asOpt[List[String]].getOrElse(throw  new Exception("prase error"))
+//        val manufacture_name = (auth \ "scope" \ "manufacture_name").get.asOpt[List[String]].getOrElse(throw  new Exception("prase error"))
+//        val edge = (auth \ "scope" \ "edge").get.asOpt[List[String]].getOrElse(throw  new Exception("prase error"))
+        var cateRes=c.getOrElse(throw new Exception("have on data"))
+        if(categorys.length != 0){
+            cateRes=categorys.map{x =>
+                val atc_three=x
+                val atc_two=findParent(atc_three)
+                val atc_one=findParent(atc_two)
+                val one=c.getOrElse(throw new Exception("have on data")).filter(y => y.get("des").get.as[String] == atc_one)
+                val two=c.getOrElse(throw new Exception("have on data")).filter(y => y.get("des").get.as[String] == atc_two)
+                val three=c.getOrElse(throw new Exception("have on data")).filter(y => y.get("des").get.as[String] == atc_three)
+                val children_three=findOtherChildren(three)
+                val list=(one::two::three::children_three::Nil).flatten
+                list
+            }.flatten
+        }
+        cateRes
+    }
  
- 
-    def Category(data: JsValue): (Option[Map[String, JsValue]], Option[JsValue]) = {
-        val result = c match {
+    def Category(data: JsValue)(implicit cm : CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = {
+        val fil=Option(categoryAuthFilter(data))
+        val result =fil match {
             case None => None
             case Some(ca) =>
                 val atc_one = ca.filter(x => x.get("level").get.as[Int] == 0).map(x => x.get("des").get.as[String]).distinct
@@ -105,10 +70,11 @@ object CategoryModule extends ModuleTrait with CategoryData {
         }
         (result, None)
     }
+
     //医疗目录联动显示
-    def categoryLinkage(data:JsValue):(Option[Map[String,JsValue]],Option[JsValue])={
+    def categoryLinkage(data:JsValue)(implicit cm : CommonModules):(Option[Map[String,JsValue]],Option[JsValue])={
         try{
-            val category=c.get
+            val category=categoryAuthFilter(data)
             val level=(data \ "level").as[String]
             val des=(data \ "des").get.as[String]
             val result=level match {

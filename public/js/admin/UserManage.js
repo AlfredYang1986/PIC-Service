@@ -291,6 +291,7 @@ function saveUserAuth(userId){
 	var save_user_auth= new Object();
     save_user_auth.user_id=userId;
     save_user_auth.scope=checkedNodes;
+    // console.log(save_user_auth);
 	$.ajax({
 	   type : "post",
 	   url : "../module/saveUserAuth",
@@ -298,6 +299,7 @@ function saveUserAuth(userId){
 	   contentType : "application/json",
 	   data : JSON.stringify(save_user_auth),
 	   success : function(data){
+
            $("#grid").data('kendoGrid').dataSource.read();
 		   alert("用户【"+userName+"】的权限已分配成功！");
 		   cancelUserAuth();
@@ -309,7 +311,7 @@ function saveUserAuth(userId){
 }
 
 function checkedNodeIds(nodes, checkedNodes) {
-    for (var i = 0; i < nodes.length; i++) {
+    for (var i = 0; i < nodes.length -1; i++) {
     	if (nodes[i].checked && nodes[i].hasChildren == false) {
     		if(nodes[i].id < 30){
     			 checkedNodes.push("c-"+nodes[i].text);
@@ -321,6 +323,12 @@ function checkedNodeIds(nodes, checkedNodes) {
         	 checkedNodeIds(nodes[i].children.view(), checkedNodes);
         }
     }
+    var beforeLen=nodes.length -1;
+    if(nodes[beforeLen].checked){
+        checkedNodes.push("s-" + "1");
+	}else {
+        checkedNodes.push("s-" + "0");
+	}
 	return checkedNodes;
 }
 

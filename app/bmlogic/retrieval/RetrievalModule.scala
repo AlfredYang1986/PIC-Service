@@ -90,6 +90,7 @@ object RetrievalModule extends ModuleTrait with RetrievalData with ConditionSear
                            |  </tr>""".stripMargin
                     index += 1
                     Map("html" -> html)
+
                 }
                 val result = Map("search_result" -> toJson(r), "page" -> toJson(Page(skip, count.get.get("count").get.as[Long])))
                 (Some(result), None)

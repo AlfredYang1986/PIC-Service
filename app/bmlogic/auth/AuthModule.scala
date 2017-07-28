@@ -133,7 +133,7 @@ object AuthModule extends ModuleTrait with AuthData {
     def checkAuthTokenTest(data : JsValue)
                           (pr : Option[Map[String, JsValue]])
                           (implicit cm : CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = {
-//        println(pr)
+        println(pr)
         (pr, None)
     }
 
@@ -238,6 +238,22 @@ object AuthModule extends ModuleTrait with AuthData {
         }
     }
 
+    def checkAuthSampleScope(data : JsValue)
+                            (pr : Option[Map[String, JsValue]])
+                            (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue])={
+        try{
+            val auth=pr.map(x => x.get("auth").get).getOrElse(throw new Exception("token auth prase error"))
+            val sampleScope=( auth \ "scope" \ "sample").asOpt[Int].getOrElse(throw new Exception("token sample prase error "))
+            var result=pr.get
+            if(sampleScope == 0){
+                result = result + ("Warning" -> toJson("没有公司名称搜索的全权限，请联系你的管理员添加"))
+            }
+            (Some(result), None)
+        }catch {
+            case ex :Exception => (None,Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+    
     def checkAuthTokenExpire(data : JsValue)
                             (pr : Option[Map[String, JsValue]])
                             (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
