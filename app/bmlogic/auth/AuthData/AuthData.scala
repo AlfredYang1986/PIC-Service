@@ -65,9 +65,6 @@ trait AuthData extends AuthScope {
     // for query
     implicit val d2m : DBObject => Map[String, JsValue] = { obj =>
         // 需要添加Scrope，的解析
-
-
-
         Map(
             "user_id" -> toJson(obj.getAs[String]("user_id").map (x => x).getOrElse(throw new Exception("db prase error"))),
             "user_name" -> toJson(obj.getAs[String]("user_name").map (x => x).getOrElse(throw new Exception("db prase error"))),

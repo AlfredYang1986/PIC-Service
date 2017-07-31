@@ -162,7 +162,6 @@ object CategoryModule extends ModuleTrait with CategoryData {
     def findOtherChildren(parents:List[Map[String,JsValue]]): (List[Map[String,JsValue]]) ={
         val category=c.get
         val findKeys=parents.map(x => x.get("des").get.as[String])
-        println(findKeys)
         val lsts=findKeys.map{x =>
             category.filter(y => y.get("parent").get.as[String]==x).distinct
         }

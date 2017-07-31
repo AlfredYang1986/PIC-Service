@@ -36,7 +36,7 @@ var reset=function () {
     $("#specifications_input").val("")
     $("#manufacture_name_input").val("")
     $("#product_type_input").val("")
-    $("#province_input").val("")
+    $("#edge_input").val("")
     $("#manufacture_type_input").val("")
     showSomeNav()
     showOtherNav()
@@ -75,6 +75,7 @@ var pageResult = function(skip) {
     });
     ajaxData("/data/search", data, "POST", function(r){
         if (r.status == "ok") {
+            console.log(r)
             hasResult = true;
             $("#tbody").empty();
             $("#pageview").show()
