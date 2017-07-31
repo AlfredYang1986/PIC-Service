@@ -8,10 +8,18 @@ import com.pharbers.aqll.common.alFileHandler.alExcelOpt.scala.alExcelDataParser
   */
 object RawDataReader {
     def read(path: String) : List[RawData]={
-        val en_rawData="bmutil/ExcelReader/XMLFile/en_RawData.xml"
-        val ch_rawData="bmutil/ExcelReader/XMLFile/ch_RawData.xml"
-        val data=new alExcelDataParser(new RawData,en_rawData,ch_rawData)
-        data.prase("bmutil/ExcelReader/ExcelFile/sampleData.xlsx")("")
-        data.data.toList.asInstanceOf[List[RawData]]
+        try{
+            val en_rawData="app/bmutil/ExcelReader/XMLFile/en_RawData.xml"
+            val ch_rawData="app/bmutil/ExcelReader/XMLFile/ch_RawData.xml"
+            val data=new alExcelDataParser(new RawData,en_rawData,ch_rawData)
+            data.prase("app/bmutil/ExcelReader/ExcelFile/sampleData.xlsx")("")
+//            println(data.data.toList.asInstanceOf[List[RawData]].size)
+            data.data.toList.asInstanceOf[List[RawData]]
+        }catch {
+            case ex:Exception =>
+                println(ex)
+                List(new RawData())
+        }
+        
     }
 }

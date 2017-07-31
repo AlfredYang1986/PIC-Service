@@ -43,7 +43,6 @@ object ConfigModule extends ModuleTrait with ConfigData{
                 ("product_type" -> preRes.head.get("product_type").get),("province" ->toJson(edge)), ("manufacture" -> toJson(manufacture_name))))
         }else{}
 
-        println(preRes)
         (Some(Map(
             "info" -> toJson(preRes)
     

@@ -13,8 +13,8 @@ public class RawData extends BaseExcel{
     private Long Quantity;
     private String Specification;
     private String Formulation;
-    private int Quarter;
-    private int SinglePackage;
+    private Integer Quarter;
+    private Integer SinglePackage;
     private String ROA;
     private String TherapyMicro;
     private String TherapyWide;
@@ -36,24 +36,6 @@ public class RawData extends BaseExcel{
         CompanyName = companyName;
     }
 
-
-
-    public Long getQuantity() {
-        return Quantity;
-    }
-
-    public void setQuantity(Long quantity) {
-        Quantity = quantity;
-    }
-
-    public int getSinglePackage() {
-        return SinglePackage;
-    }
-
-    public void setSinglePackage(int singlePackage) {
-        SinglePackage = singlePackage;
-    }
-
     public String getYear() {
         return Year;
     }
@@ -62,7 +44,6 @@ public class RawData extends BaseExcel{
         Year = year;
     }
 
-
     public Long getSalesAmount() {
         return SalesAmount;
     }
@@ -70,12 +51,13 @@ public class RawData extends BaseExcel{
     public void setSalesAmount(Long salesAmount) {
         SalesAmount = salesAmount;
     }
-    public int getQuarter() {
-        return Quarter;
+
+    public Long getQuantity() {
+        return Quantity;
     }
 
-    public void setQuarter(int quarter) {
-        Quarter = quarter;
+    public void setQuantity(Long quantity) {
+        Quantity = quantity;
     }
 
     public String getSpecification() {
@@ -94,6 +76,21 @@ public class RawData extends BaseExcel{
         Formulation = formulation;
     }
 
+    public int getQuarter() {
+        return Quarter;
+    }
+
+    public void setQuarter(Integer quarter) {
+        Quarter = quarter;
+    }
+
+    public int getSinglePackage() {
+        return SinglePackage;
+    }
+
+    public void setSinglePackage(Integer singlePackage) {
+        SinglePackage = singlePackage;
+    }
 
     public String getROA() {
         return ROA;
@@ -126,5 +123,9 @@ public class RawData extends BaseExcel{
     public void setCity(String city) {
         City = city;
     }
+
+
+
+
 
 }
