@@ -3,25 +3,26 @@ package bmlogic.dbData
 import java.util.UUID
 
 import bminjection.db.DBTrait
-import bminjection.db.LoadConfig.d2m
-import bmlogic.dbData.DBDataMessage.msg_rawData2DB
+import bmlogic.dbData.DBDataMessage.{msg_rawData2DB, msg_readRawData}
+import bmlogic.dbData.DataStructure.DataStructure
 import bmmessages.{CommonModules, MessageDefines}
 import bmpattern.ModuleTrait
 import bmutil.ExcelReader.JavaBean.RawData
 import bmutil.ExcelReader.RawDataReader
-import bmutil.dao.from
 import bmutil.errorcode.ErrorCode
 import com.mongodb.casbah.Imports.MongoDBObject
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json.toJson
 
-import bmlogic.dbData.DataStructure
+import scala.collection.immutable.Map
+import com.mongodb.casbah.Imports._
 /**
   * Created by yym on 7/27/17.
   */
-object DBDataModule extends ModuleTrait{
+object DBDataModule extends ModuleTrait with DataStructure{
     def dispatchMsg(msg : MessageDefines)(pr : Option[Map[String, JsValue]])(implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = msg match {
         case msg_rawData2DB(data) => rawData2DB(data)
+        case msg_readRawData(data) => readRawData(data)(pr)
         case _ => ???
     }
     def rawData2DB(data:JsValue)(implicit cm : CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) ={
@@ -57,8 +58,41 @@ object DBDataModule extends ModuleTrait{
         
     }
     
-//    def readRawData(data:JsValue)(implicit cm : CommonModules): (Option[Map[String, JsValue]], Option[JsValue])={
-//        val db=cm.modules.get.get("db").map(x =>x).asInstanceOf[DBTrait]
-//        val data : List[Map[String, JsValue]]=(from db() in "rowData")
-//    }
+    def readRawData(data:JsValue)
+                   (pr : Option[Map[String, JsValue]])
+                   (implicit cm : CommonModules): (Option[Map[String, JsValue]], Option[JsValue])={
+        try{
+            val db=cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+            val group=MongoDBObject("_id" -> "count", "counter" -> MongoDBObject("$sum" -> 1))
+            val counter=db.aggregate(MongoDBObject(),"raw_data",group){x =>
+                println(x)
+                val result=x.getAs[List[BasicDBObject]]("result").get
+                val status=x.getAs[Double]("ok").get
+                val gr=result.head.getAs[Int]("counter")
+                Map("ok" -> toJson(status),
+                    "counter"->toJson(gr)
+                )
+                
+            }.get.get("counter").get.as[Int]
+            val take=10
+            val pages=if(counter % take==0) counter/take else counter/take+1
+            val  nextIndex = (data \ "nextIndex").asOpt[Int].getOrElse(1)
+            val skip = (nextIndex-1) * take
+            val lst : List[Map[String, JsValue]]=db.queryAllObject( "raw_data", skip = skip, take = 10)
+            val scope=pr.get("Warning").as[String]
+            if(scope=="None"){
+                (None,Some(toJson(Map("pages" -> toJson(pages),
+                    "currIndex" -> toJson(nextIndex),
+                    "result" -> toJson(lst)
+
+                ))))
+            }else{
+                (None,Some(toJson(Map("Warning" -> toJson("")))))
+            }
+        }catch {
+            case ex :Exception =>
+                (None , Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+        
+    }
 }

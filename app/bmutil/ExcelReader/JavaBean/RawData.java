@@ -10,7 +10,7 @@ public class RawData extends BaseExcel{
     private String CompanyName;
     private String Year;
     private Long SalesAmount;
-    private Long Quantity;
+    private String Quantity;
     private String Specification;
     private String Formulation;
     private Integer Quarter;
@@ -52,11 +52,11 @@ public class RawData extends BaseExcel{
         SalesAmount = salesAmount;
     }
 
-    public Long getQuantity() {
+    public String getQuantity() {
         return Quantity;
     }
 
-    public void setQuantity(Long quantity) {
+    public void setQuantity(String quantity) {
         Quantity = quantity;
     }
 

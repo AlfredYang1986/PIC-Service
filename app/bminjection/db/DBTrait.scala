@@ -14,7 +14,8 @@ trait DBTrait {
                    (implicit t : DBObject => Map[String, JsValue]) : Option[Map[String, JsValue]]
     def queryMultipleObject(condition : DBObject, db_name : String, sort : String = "date", skip : Int = 0, take : Int = 20)
                            (implicit t : DBObject => Map[String, JsValue]) : List[Map[String, JsValue]]
-
+    def queryAllObject(db_name:String,skip : Int = 0, take : Int = 20)
+                      (implicit t:DBObject => Map[String,JsValue]):List[Map[String,JsValue]]
 
     def querySum(condition : DBObject, db_name : String)
                 (sum : (Map[String, JsValue], Map[String, JsValue]) => Map[String, JsValue])

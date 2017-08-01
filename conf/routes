@@ -64,8 +64,9 @@ POST    /module/queryAuthTree                   controllers.UserManageController
 #更新用户授权
 POST    /module/saveUserAuth                    controllers.UserManageController.saveUserAuth
 
-#插入数据
-POST    /rawData/Insert                         controllers.DBDataController.InsertRawData
+#生数据操作
+POST    /rawData/insert                         controllers.DBDataController.InsertRawData
+POST    /rawData/read                           controllers.DBDataController.ReadRawData
 #个人中心
 GET     /userInfo                               controllers.PagesController.userInfo
 

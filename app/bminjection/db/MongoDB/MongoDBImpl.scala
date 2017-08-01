@@ -2,7 +2,7 @@ package bminjection.db.MongoDB
 
 import bminjection.db.DBTrait
 import bmutil.dao.{_data_connection, from}
-import com.mongodb.casbah.Imports
+import com.mongodb.casbah
 import com.mongodb.casbah.Imports._
 import play.api.libs.json.JsValue
 
@@ -37,6 +37,11 @@ trait MongoDBImpl extends DBTrait {
     override def queryMultipleObject(condition : DBObject, db_name : String, sort : String = "date", skip : Int = 0, take : Int = 20)
                            (implicit t : DBObject => Map[String, JsValue]) : List[Map[String, JsValue]] = {
         (from db() in db_name where condition).selectSkipTop(skip)(take)(sort)(x => t(x)).toList
+    }
+    
+    override def queryAllObject(db_name: String,skip: Int=0, take: Int=20)
+                               (implicit t: (casbah.Imports.DBObject) => Map[String, JsValue]): List[Map[String, JsValue]] = {
+        (from db() in db_name ).selectSkipTopLoc(skip)(take)(x => t(x)).toList
     }
     
  
