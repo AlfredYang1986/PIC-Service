@@ -31,7 +31,10 @@ class PagesController extends Controller {
     def loginLog = Action{
         Ok(views.html.loginLog())
     }
-
+    //显示样本数据界面
+    def sampleData = Action{
+        Ok(views.html.sampleData())
+    }
     //个人中心
     def userInfo = Action{
         Ok(views.html.useInfo())

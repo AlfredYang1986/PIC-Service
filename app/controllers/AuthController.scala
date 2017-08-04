@@ -36,8 +36,7 @@ class AuthController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : A
             MessageRoutes(msg_log(toJson(Map("method" -> toJson("auth check"))), jv)
                 :: msg_AuthTokenParser(jv) :: msg_CheckAuthTokenTest(jv) :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
         })
-
-
+  
     def authChangePwd = Action (Ok(""))
     def authUpdate = Action (Ok(""))
     def authLogout = Action (Ok(""))

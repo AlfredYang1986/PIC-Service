@@ -8,6 +8,7 @@ ul,li{margin:0;padding:0}
 .logo_position{
     margin-top: 5px;
     margin-right: 15px;
+    cursor: pointer;
 }
 .guide{
     background-color: #222222;

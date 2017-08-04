@@ -17,7 +17,7 @@ trait DataStructure {
         (js \ "CompanyName").asOpt[String].map (x => x).getOrElse(Unit)
         (js \ "Year").asOpt[String].map (x => x).getOrElse(Unit)
         (js \ "SalesAmount").asOpt[Long].map (x => x).getOrElse(Unit)
-        (js \ "Quantity").asOpt[String].map (x => x).getOrElse(Unit)
+        (js \ "Quantity").asOpt[Long].map (x => x).getOrElse(Unit)
         (js \ "Specification").asOpt[String].map (x => x).getOrElse(Unit)
         (js \ "Formulation").asOpt[String].map (x => x).getOrElse(Unit)
         (js \ "Quarter").asOpt[Int].map (x => x).getOrElse(Unit)
@@ -49,7 +49,7 @@ trait DataStructure {
         build += "CompanyName" -> (js \ "CompanyName").asOpt[String].map (x => x).getOrElse(Unit)
         build += "Year" -> (js \ "Year").asOpt[String].map (x => x).getOrElse(Unit)
         build += "SalesAmount" -> (js \ "SalesAmount").asOpt[Long].map (x => x).getOrElse(Unit)
-        build += "Quantity" ->(js \ "Quantity").asOpt[String].map (x => x).getOrElse(Unit)
+        build += "Quantity" ->(js \ "Quantity").asOpt[Long].map (x => x).getOrElse(Unit)
         build += "Specification" -> (js \ "Specification").asOpt[String].map (x => x).getOrElse(Unit)
         build += "Formulation" -> (js \ "Formulation").asOpt[String].map (x => x).getOrElse(Unit)
         build += "Quarter" -> (js \ "Quarter").asOpt[Int].map (x => x).getOrElse(Unit)
@@ -64,13 +64,11 @@ trait DataStructure {
     
     
     implicit val d2m : DBObject => Map[String, JsValue] = { obj =>
-        println(obj)
-    
         Map(
             "GenericName" -> toJson(obj.getAs[String]("GenericName").map(x => x).getOrElse(throw new Exception("db prase error"))),
             "CompanyName" -> toJson(obj.getAs[String]("CompanyName").map(x => x).getOrElse(throw new Exception("db prase error"))),
             "Year" -> toJson(obj.getAs[String]("Year").map(x => x).getOrElse(throw new Exception("db prase error"))),
-            "Quantity" -> toJson(obj.getAs[String]("Quantity").map(x => x).getOrElse(throw new Exception("db prase error"))),
+            "Quantity" -> toJson(obj.getAs[Long]("Quantity").map(x => x).getOrElse(throw new Exception("db prase error"))),
             "SalesAmount" -> toJson(obj.getAs[Long]("SalesAmount").map(x => x).getOrElse(throw new Exception("db prase error"))),
             "Specification" -> toJson(obj.getAs[String]("Specification").map(x => x).getOrElse(throw new Exception("db prase error"))),
             "Formulation" -> toJson(obj.getAs[String]("Formulation").map(x => x).getOrElse(throw new Exception("db prase error"))),

@@ -5,6 +5,7 @@ var searchCount = 0;
 var hasResult = false
 
 /**
+ * ***************************************************************
  * 重置按钮
  */
 var reset=function () {
@@ -75,7 +76,6 @@ var pageResult = function(skip) {
     });
     ajaxData("/data/search", data, "POST", function(r){
         if (r.status == "ok") {
-            console.log(r)
             hasResult = true;
             $("#tbody").empty();
             $("#pageview").show()
@@ -124,6 +124,7 @@ var getTime = function() {
 }
 
 /**
+ * ************************************************************************
  * 显示主页的四个小汇总
  */
 var showDataGather = function() {
@@ -137,11 +138,20 @@ var showDataGather = function() {
             "date": c.date
         }
     });
+    console.log(data)
+    if(c.date==undefined&&(c.oral_name!=undefined||c.product_name!=undefined)){
+        calcMarket(data);
+        productSize(data);
+        $('#zengzl').text("");
+        $('#fene').text("");
+    }else {
+        calcMarket(data);
+        calcTrend(data);
+        calcPercentage(data);
+        productSize(data);
+    }
 
-    calcMarket(data)
-    calcTrend(data)
-    calcPercentage(data)
-    productSize(data)
+
 
 }
 
@@ -166,7 +176,7 @@ var calcMarket = function(data) {
 }
 
 /**
- * 市场增占率
+ * 市场增长率
  */
 var calcTrend = function(data) {
     searchCount++
@@ -264,3 +274,7 @@ var report = function() {
     // w.window.location = "/report"+"aa"
 }
 
+var goSampleData = function () {
+    var w = window.open("")
+    w.window.location = "/sampleData/show"
+}

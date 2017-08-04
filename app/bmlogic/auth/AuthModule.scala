@@ -134,7 +134,7 @@ object AuthModule extends ModuleTrait with AuthData {
     def checkAuthTokenTest(data : JsValue)
                           (pr : Option[Map[String, JsValue]])
                           (implicit cm : CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = {
-        println(pr)
+//        println(pr)
         (pr, None)
     }
 

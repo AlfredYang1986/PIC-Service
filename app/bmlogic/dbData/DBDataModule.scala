@@ -37,7 +37,7 @@ object DBDataModule extends ModuleTrait with DataStructure{
                 build += "CompanyName" -> obj.getCompanyName
                 build += "Year" -> obj.getYear
                 build += "SalesAmount" -> obj.getSalesAmount
-                build += "Quantity" -> obj.getSpecification
+                build += "Quantity" -> obj.getQuantity
                 build += "Specification" -> obj.getSpecification
                 build += "Formulation" -> obj.getFormulation
                 build += "Quarter" -> obj.getQuarter
@@ -65,7 +65,6 @@ object DBDataModule extends ModuleTrait with DataStructure{
             val db=cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
             val group=MongoDBObject("_id" -> "count", "counter" -> MongoDBObject("$sum" -> 1))
             val counter=db.aggregate(MongoDBObject(),"raw_data",group){x =>
-                println(x)
                 val result=x.getAs[List[BasicDBObject]]("result").get
                 val status=x.getAs[Double]("ok").get
                 val gr=result.head.getAs[Int]("counter")
@@ -81,13 +80,15 @@ object DBDataModule extends ModuleTrait with DataStructure{
             val lst : List[Map[String, JsValue]]=db.queryAllObject( "raw_data", skip = skip, take = 10)
             val scope=pr.get("Warning").as[String]
             if(scope=="None"){
-                (None,Some(toJson(Map("pages" -> toJson(pages),
+                (None,Some(toJson(Map(
+                    "status" -> toJson("ok"),
+                    "pages" -> toJson(pages),
                     "currIndex" -> toJson(nextIndex),
                     "result" -> toJson(lst)
 
                 ))))
             }else{
-                (None,Some(toJson(Map("Warning" -> toJson("")))))
+                (None,Some(toJson(Map("status" -> toJson("no")))))
             }
         }catch {
             case ex :Exception =>
