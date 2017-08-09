@@ -9,4 +9,5 @@ import play.api.libs.json.JsValue
 abstract class msg_DBDataCommand extends CommonMessage
 object DBDataMessage {
     case class msg_rawData2DB(data :JsValue) extends msg_DBDataCommand
+    case class msg_readRawData(data:JsValue) extends msg_DBDataCommand
 }

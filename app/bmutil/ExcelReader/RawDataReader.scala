@@ -17,7 +17,6 @@ object RawDataReader {
             data.data.toList.asInstanceOf[List[RawData]]
         }catch {
             case ex:Exception =>
-                println(ex)
                 List(new RawData())
         }
         

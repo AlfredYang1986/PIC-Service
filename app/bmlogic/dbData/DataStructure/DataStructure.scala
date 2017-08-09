@@ -64,7 +64,6 @@ trait DataStructure {
     
     
     implicit val d2m : DBObject => Map[String, JsValue] = { obj =>
-    
         Map(
             "GenericName" -> toJson(obj.getAs[String]("GenericName").map(x => x).getOrElse(throw new Exception("db prase error"))),
             "CompanyName" -> toJson(obj.getAs[String]("CompanyName").map(x => x).getOrElse(throw new Exception("db prase error"))),

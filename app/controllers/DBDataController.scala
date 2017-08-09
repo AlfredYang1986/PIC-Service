@@ -5,9 +5,9 @@ import javax.inject.Inject
 import akka.actor.ActorSystem
 import bminjection.db.DBTrait
 import bminjection.token.AuthTokenTrait
+import bmlogic.auth.AuthMessage.{msg_AuthTokenParser, msg_CheckAuthSampleScope}
 import bmlogic.common.requestArgsQuery
-import bmlogic.config.ConfigMessage.msg_QueryInfoCommand
-import bmlogic.dbData.DBDataMessage.msg_rawData2DB
+import bmlogic.dbData.DBDataMessage.{msg_rawData2DB, msg_readRawData}
 import bmmessages.{CommonModules, MessageRoutes}
 import bmpattern.LogMessage.msg_log
 import bmpattern.ResultMessage.msg_CommonResultMessage
@@ -19,11 +19,19 @@ import play.api.mvc.{Action, Controller}
   */
 class DBDataController @Inject ()(as_inject : ActorSystem, dbt : DBTrait, att : AuthTokenTrait) extends Controller{
     implicit val as = as_inject
+    
     def InsertRawData = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
         import bmpattern.LogMessage.common_log
         import bmpattern.ResultMessage.common_result
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("Insert raw data"))), jv)
             ::msg_rawData2DB(jv)::msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
+    })
+    
+    def ReadRawData = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
+        import bmpattern.LogMessage.common_log
+        import bmpattern.ResultMessage.common_result
+        MessageRoutes(msg_log(toJson(Map("method" -> toJson("read raw data"))), jv)
+            ::msg_AuthTokenParser(jv)::msg_CheckAuthSampleScope(jv)::msg_readRawData(jv)::msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
     })
     
 }

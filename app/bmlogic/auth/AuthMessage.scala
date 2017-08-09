@@ -17,4 +17,5 @@ object AuthMessage {
 	case class msg_CheckProductLevelScope(data : JsValue) extends msg_AuthCommand
 	case class msg_CheckManufactureNameScope(data : JsValue) extends msg_AuthCommand
 	case class msg_CheckManufactureTypeScope(data : JsValue) extends msg_AuthCommand
+	case class msg_CheckAuthSampleScope(data : JsValue) extends  msg_AuthCommand
 }

@@ -56,7 +56,6 @@ var showSomeNav = function() {
         data: JSON.stringify(js),
         contentType: "application/json,charset=utf-8",
         success: function (data) {
-            console.log(data)
             if (data.status == "ok") {
                 leftInitial("atc1", "category", data.result.atc_one)
                 leftInitial("atc2", "category", data.result.atc_tow)
@@ -166,19 +165,18 @@ function showCategoryNav(json,value){
         data: JSON.stringify(json),
         contentType: "application/json,charset=utf-8",
         success: function (data) {
-            console.log(data)
             if (data.status == "ok") {
-                reloadLeft("atc1",data.result.atc_one,value)
-                reloadLeft("atc2", data.result.atc_tow,value)
-                reloadLeft("atc3", data.result.atc_three,value)
-                reloadLeft("oral_name",  data.result.oral_name,value)
-                reloadLeft("product_name", data.result.product,value)
+                reloadLeft("atc1",data.result.atc_one,"category")
+                reloadLeft("atc2", data.result.atc_tow,"category")
+                reloadLeft("atc3", data.result.atc_three,"category")
+                reloadLeft("oral_name",  data.result.oral_name,"oral_name")
+                reloadLeft("product_name", data.result.product,"product_name")
             }
         }
     })
 
 }
-function reloadLeft(id,result,value) {
+function reloadLeft(id,result,key) {
     var ulObj=$('#'+id+'_ul')
     ulObj.find("li").remove()
     $.each(result, function (i, item) {
@@ -240,8 +238,9 @@ function searchClick(c,id,key){
             "specifications": js.specifications
         }
     }else if(id=="oral_name"){
-        var json={
 
+        var json={
+            "token":token,
             "level":"3",
             "des":value
         }
@@ -250,6 +249,7 @@ function searchClick(c,id,key){
 
     }else if(id=="product_name"){
         var json={
+            "token":token,
             "level":"4",
             "des":value
         }
@@ -283,7 +283,6 @@ var getSearchValue = function () {
         }
 
     })
-
     return $.extend(categoryChoose, edge, oral_name, product_name, manufacture_type, manufacture_name, product_type, specifications, pac)
 }
 
@@ -362,3 +361,4 @@ $("#userInfo").click(function () {
         }
     }, function(e){console.error(e)})
 })
+

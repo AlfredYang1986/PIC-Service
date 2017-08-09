@@ -102,3 +102,7 @@ var ajaxData = function(url, data, type, successfun, errorfun) {
         }
     });
 }
+//--------------------------------------------------回主页---------------------------------------
+function goHome() {
+    window.location = "/data/report";
+}
