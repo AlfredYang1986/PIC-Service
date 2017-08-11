@@ -32,21 +32,36 @@ object ConfigModule extends ModuleTrait with ConfigData{
         val auth = att.decrypt2JsValue(token)
         val manufacture_name = (auth \ "scope" \ "manufacture_name").get.asOpt[List[String]].getOrElse(throw new Exception("prase error"))
         val edge = (auth \ "scope" \ "edge").get.asOpt[List[String]].getOrElse(throw new Exception("prase error"))
-        val res =if (!manufacture_name.isEmpty && edge.isEmpty) {
-            List( Map(("package" -> preRes.head.get("package").get),("specifications" -> preRes.head.get("specifications").get),
-                ("product_type" -> preRes.head.get("product_type").get),("province" ->toJson(edge)), ("manufacture" -> preRes.head.get("manufacture").get)))
-        }else if (!edge.isEmpty && manufacture_name.isEmpty) {
-           List( Map(("package" -> preRes.head.get("package").get),("specifications" -> preRes.head.get("specifications").get),
-                ("product_type" -> preRes.head.get("product_type").get),("province" -> preRes.head.get("province").get), ("manufacture" -> toJson(manufacture_name))))
-        }else if(!edge.isEmpty && !manufacture_name.isEmpty){
-            List( Map(("package" -> preRes.head.get("package").get),("specifications" -> preRes.head.get("specifications").get),
-                ("product_type" -> preRes.head.get("product_type").get),("province" ->toJson(edge)), ("manufacture" -> toJson(manufacture_name))))
-        }else{
-            preRes
+//        val res =if (!manufacture_name.isEmpty && edge.isEmpty) {
+//            List( Map(("package" -> preRes.head.get("package").get),("specifications" -> preRes.head.get("specifications").get),
+//                ("product_type" -> preRes.head.get("product_type").get),("province" ->toJson(edge)), ("manufacture" -> preRes.head.get("manufacture").get)))
+//        }else if (!edge.isEmpty && manufacture_name.isEmpty) {
+//           List( Map(("package" -> preRes.head.get("package").get),("specifications" -> preRes.head.get("specifications").get),
+//                ("product_type" -> preRes.head.get("product_type").get),("province" -> preRes.head.get("province").get), ("manufacture" -> toJson(manufacture_name))))
+//        }else if(!edge.isEmpty && !manufacture_name.isEmpty){
+//            List( Map(("package" -> preRes.head.get("package").get),("specifications" -> preRes.head.get("specifications").get),
+//                ("product_type" -> preRes.head.get("product_type").get),("province" ->toJson(edge)), ("manufacture" -> toJson(manufacture_name))))
+//        }else{
+//            preRes
+//        }
+        val condition_manufacture=if(manufacture_name.isEmpty) 0 else 1
+        val condition_edge=if(edge.isEmpty) 0 else 1
+        val result= List(condition_manufacture , condition_edge) match {
+            case List(1,0) =>
+                List( Map(("package" -> preRes.head.get("package").get),("specifications" -> preRes.head.get("specifications").get),
+                    ("product_type" -> preRes.head.get("product_type").get),("province" ->toJson(edge)), ("manufacture" -> preRes.head.get("manufacture").get)))
+            case List(0,1) =>
+                List( Map(("package" -> preRes.head.get("package").get),("specifications" -> preRes.head.get("specifications").get),
+                    ("product_type" -> preRes.head.get("product_type").get),("province" -> preRes.head.get("province").get), ("manufacture" -> toJson(manufacture_name))))
+            case List(1,1) =>
+                List( Map(("package" -> preRes.head.get("package").get),("specifications" -> preRes.head.get("specifications").get),
+                    ("product_type" -> preRes.head.get("product_type").get),("province" ->toJson(edge)), ("manufacture" -> toJson(manufacture_name))))
+            case _ =>
+                preRes
         }
 
         (Some(Map(
-            "info" -> toJson(res)
+            "info" -> toJson(result)
     
         )), None)
     }
