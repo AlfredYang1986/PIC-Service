@@ -8,7 +8,6 @@ import bmpattern.ModuleTrait
 import bmutil.errorcode.ErrorCode
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json.toJson
-import bminjection.db.LoadCategory._
 import bminjection.token.AuthTokenTrait
 
 import scala.collection.immutable.Map
@@ -18,7 +17,6 @@ import scala.collection.immutable.Map
   */
 object CategoryModule extends ModuleTrait with CategoryData {
     
-    lazy val c = category
     
     def dispatchMsg(msg : MessageDefines)(pr : Option[Map[String, JsValue]])(implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = msg match {
         case msg_Category(data) => Category(data)
@@ -34,6 +32,7 @@ object CategoryModule extends ModuleTrait with CategoryData {
         val categorys = (auth \ "scope" \ "category").get.asOpt[List[String]].getOrElse(throw  new Exception("prase error"))
 //        val manufacture_name = (auth \ "scope" \ "manufacture_name").get.asOpt[List[String]].getOrElse(throw  new Exception("prase error"))
 //        val edge = (auth \ "scope" \ "edge").get.asOpt[List[String]].getOrElse(throw  new Exception("prase error"))
+        val c = LoadCategory
         var cateRes=c.getOrElse(throw new Exception("have on data"))
         if(categorys.length != 0){
             cateRes=categorys.map{x =>
@@ -48,27 +47,34 @@ object CategoryModule extends ModuleTrait with CategoryData {
                 list
             }.flatten
         }
-        cateRes
+        if(cateRes.isEmpty) throw new Exception("category authority filter error")
+        else cateRes
     }
  
     def Category(data: JsValue)(implicit cm : CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = {
-        val fil=Option(categoryAuthFilter(data))
-        val result =fil match {
-            case None => None
-            case Some(ca) =>
-                val atc_one = ca.filter(x => x.get("level").get.as[Int] == 0).map(x => x.get("des").get.as[String]).distinct
-                val atc_tow = ca.filter(x => x.get("level").get.as[Int] == 1).map(x => x.get("des").get.as[String]).distinct
-                val atc_three = ca.filter(x => x.get("level").get.as[Int] == 2).map(x => x.get("des").get.as[String]).distinct
-                val oral = ca.filter(x => x.get("level").get.as[Int] == 3).map(x => x.get("des").get.as[String]).distinct
-                val product = ca.filter(x => x.get("level").get.as[Int] == 3).map(x => x.get("def").get.as[String]).distinct
-                Some(Map("atc_one" -> toJson(atc_one),
-                    "atc_tow" -> toJson(atc_tow),
-                    "atc_three" -> toJson(atc_three),
-                    "oral_name" -> toJson(oral),
-                    "product" -> toJson(product)))
-            case _ => ???
+        try{
+            val fil=Option(categoryAuthFilter(data))
+            val result =fil match {
+                case None => None
+                case Some(ca) =>
+                    val atc_one = ca.filter(x => x.get("level").get.as[Int] == 0).map(x => x.get("des").get.as[String]).distinct
+                    val atc_tow = ca.filter(x => x.get("level").get.as[Int] == 1).map(x => x.get("des").get.as[String]).distinct
+                    val atc_three = ca.filter(x => x.get("level").get.as[Int] == 2).map(x => x.get("des").get.as[String]).distinct
+                    val oral = ca.filter(x => x.get("level").get.as[Int] == 3).map(x => x.get("des").get.as[String]).distinct
+                    val product = ca.filter(x => x.get("level").get.as[Int] == 3).map(x => x.get("def").get.as[String]).distinct
+                    Some(Map("atc_one" -> toJson(atc_one),
+                        "atc_tow" -> toJson(atc_tow),
+                        "atc_three" -> toJson(atc_three),
+                        "oral_name" -> toJson(oral),
+                        "product" -> toJson(product)))
+                case _ => ???
+                
+            }
+            (result, None)
+        }catch {
+            case ex: Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
-        (result, None)
+        
     }
 
     //医疗目录联动显示
@@ -151,24 +157,24 @@ object CategoryModule extends ModuleTrait with CategoryData {
         }
         
     }
-    def findChildren(parents:List[Map[String,JsValue]]): (List[Map[String,JsValue]]) ={
-        val category=c.get
+    def findChildren(parents:List[Map[String,JsValue]])(implicit cm : CommonModules ): (List[Map[String,JsValue]]) ={
+        val category= LoadCategory.get
         val findKeys=parents.map(x => x.get("def").get.as[String])
         val lsts=findKeys.map{x =>
             category.filter(y => y.get("parent").get.as[String]==x).distinct
         }
         lsts.flatten
     }
-    def findOtherChildren(parents:List[Map[String,JsValue]]): (List[Map[String,JsValue]]) ={
-        val category=c.get
+    def findOtherChildren(parents:List[Map[String,JsValue]])(implicit cm : CommonModules ): (List[Map[String,JsValue]]) ={
+        val category= LoadCategory.get
         val findKeys=parents.map(x => x.get("des").get.as[String])
         val lsts=findKeys.map{x =>
             category.filter(y => y.get("parent").get.as[String]==x).distinct
         }
         lsts.flatten
     }
-    def findParent(child:String):String={
-        val category=c.get
+    def findParent(child:String)(implicit cm : CommonModules ):String={
+        val category= LoadCategory.get
         val parentKey=category.filter(x => x.get("des").get.as[String] == child).distinct.head
         .get("parent").get.as[String]
         val parent=category.filter(x => x.get("def").get.as[String] == parentKey).distinct.head
@@ -176,12 +182,19 @@ object CategoryModule extends ModuleTrait with CategoryData {
         parent
         
     }
-    def findOtherParent(child:String):String={
-        val category=c.get
+    def findOtherParent(child:String)(implicit cm : CommonModules ):String={
+        val category= LoadCategory.get
         val parentKey=category.filter(x => x.get("des").get.as[String] == child).distinct.head
             .get("parent").get.as[String]
         parentKey
     
     }
+    def LoadCategory(implicit cm : CommonModules ): Option[List[Map[String, JsValue]]] ={
+            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+            val category: Option[List[Map[String, JsValue]]] = Some(db.loadAllData("category"))
+            if(category.isEmpty) throw new Exception("load category error")
+            else category
+    }
+    
 
 }

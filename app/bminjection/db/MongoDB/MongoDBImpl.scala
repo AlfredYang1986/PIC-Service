@@ -40,8 +40,12 @@ trait MongoDBImpl extends DBTrait {
     }
     
     override def queryAllObject(db_name: String,skip: Int=0, take: Int=20)
-                               (implicit t: (casbah.Imports.DBObject) => Map[String, JsValue]): List[Map[String, JsValue]] = {
+                               (implicit t: DBObject => Map[String, JsValue]): List[Map[String, JsValue]] = {
         (from db() in db_name ).selectSkipTopLoc(skip)(take)(x => t(x)).toList
+    }
+    override def loadAllData(db_name:String)
+                            (implicit t: DBObject => Map[String, JsValue]): List[Map[String, JsValue]] = {
+        (from db() in db_name).select(x => t(x)).toList
     }
     
  

@@ -7,7 +7,7 @@ import bminjection.db.DBTrait
 import bminjection.token.AuthTokenTrait
 import bmlogic.auth.AuthMessage.{msg_AuthTokenParser, msg_CheckAuthSampleScope}
 import bmlogic.common.requestArgsQuery
-import bmlogic.dbData.DBDataMessage.{msg_rawData2DB, msg_readRawData}
+import bmlogic.sampleData.SampleDataMessage.{msg_rawData2Sample, msg_readRawData}
 import bmmessages.{CommonModules, MessageRoutes}
 import bmpattern.LogMessage.msg_log
 import bmpattern.ResultMessage.msg_CommonResultMessage
@@ -24,7 +24,7 @@ class DBDataController @Inject ()(as_inject : ActorSystem, dbt : DBTrait, att : 
         import bmpattern.LogMessage.common_log
         import bmpattern.ResultMessage.common_result
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("Insert raw data"))), jv)
-            ::msg_rawData2DB(jv)::msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
+            ::msg_rawData2Sample(jv)::msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
     })
     
     def ReadRawData = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>

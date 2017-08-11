@@ -51,13 +51,11 @@ trait ConditionSearchFunc {
                 product_name_opt.map { x =>
                     (from db() in "category" where("def" -> x) select(x => x.getAs[String]("parent").get)).toList
                 }.getOrElse(Nil)
-            Some($or((oral_lst ++ product_lst).distinct.map (x => DBObject("category" -> x))))
+            if(oral_lst.isEmpty&&product_lst.isEmpty) None
+            else
+                Some($or((oral_lst ++ product_lst).distinct.map (x => DBObject("category" -> x))))
         }
     }
-    
-    //    def parentCategoryConditionParse(js : JsValue, pr : Map[String, JsValue]) : Option[DBObject] = {
-    //
-    //    }
     
     def categoryConditionParse(js : JsValue, pr : Map[String, JsValue]) : Option[DBObject] = {
         /**
@@ -129,7 +127,6 @@ trait ConditionSearchFunc {
         val cat_condition : Option[DBObject] =
             if (cat.isEmpty) None
             else Some($or(cat map ("category" $eq _)))
-        
         /**
           * 通用名 * 产品名 * 生产厂商类型 * 剂型 * 规格 * 包装
           */

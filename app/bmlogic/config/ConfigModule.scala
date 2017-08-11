@@ -26,25 +26,27 @@ object ConfigModule extends ModuleTrait with ConfigData{
 
     def infoQuery(data : JsValue)(implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
         val db = cm.modules.get.get("db").map(x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
-        var preRes = db.queryMultipleObject(DBObject("index" -> "PIC"), "config")
+        val preRes = db.queryMultipleObject(DBObject("index" -> "PIC"), "config")
         val token = (data \ "token").get.asOpt[String].map(x => x).getOrElse(throw new Exception("can't find token"))
         val att = cm.modules.get.get("att").map(x => x.asInstanceOf[AuthTokenTrait]).getOrElse(throw new Exception("no encrypt impl"))
         val auth = att.decrypt2JsValue(token)
         val manufacture_name = (auth \ "scope" \ "manufacture_name").get.asOpt[List[String]].getOrElse(throw new Exception("prase error"))
         val edge = (auth \ "scope" \ "edge").get.asOpt[List[String]].getOrElse(throw new Exception("prase error"))
-        if (!manufacture_name.isEmpty && edge.isEmpty) {
-            preRes =List( Map(("package" -> preRes.head.get("package").get),("specifications" -> preRes.head.get("specifications").get),
+        val res =if (!manufacture_name.isEmpty && edge.isEmpty) {
+            List( Map(("package" -> preRes.head.get("package").get),("specifications" -> preRes.head.get("specifications").get),
                 ("product_type" -> preRes.head.get("product_type").get),("province" ->toJson(edge)), ("manufacture" -> preRes.head.get("manufacture").get)))
         }else if (!edge.isEmpty && manufacture_name.isEmpty) {
-            preRes =List( Map(("package" -> preRes.head.get("package").get),("specifications" -> preRes.head.get("specifications").get),
+           List( Map(("package" -> preRes.head.get("package").get),("specifications" -> preRes.head.get("specifications").get),
                 ("product_type" -> preRes.head.get("product_type").get),("province" -> preRes.head.get("province").get), ("manufacture" -> toJson(manufacture_name))))
         }else if(!edge.isEmpty && !manufacture_name.isEmpty){
-            preRes =List( Map(("package" -> preRes.head.get("package").get),("specifications" -> preRes.head.get("specifications").get),
+            List( Map(("package" -> preRes.head.get("package").get),("specifications" -> preRes.head.get("specifications").get),
                 ("product_type" -> preRes.head.get("product_type").get),("province" ->toJson(edge)), ("manufacture" -> toJson(manufacture_name))))
-        }else{}
+        }else{
+            preRes
+        }
 
         (Some(Map(
-            "info" -> toJson(preRes)
+            "info" -> toJson(res)
     
         )), None)
     }
@@ -55,6 +57,7 @@ object ConfigModule extends ModuleTrait with ConfigData{
         val user_scope = queryUserById(data)._1.get.get("scope").get
         val user_edge = user_scope.\("edge").get.asOpt[List[JsValue]].get
         val user_category = user_scope.\("category").get.asOpt[List[JsValue]].get
+        val user_sample = user_scope.\("sample").get.asOpt[Int].get
 //        val user_manufacture_name = user_scope.\("manufacture_name").get.asOpt[List[JsValue]].get
 //        val user_is_admin = user_scope.\("is_admin").get
 
@@ -63,9 +66,6 @@ object ConfigModule extends ModuleTrait with ConfigData{
         val province = db.queryObject(DBObject(),"config").get.get("province").get.asOpt[List[JsValue]].get
 
         val level = category.groupBy(x => (x \ "level").get)
-        
-        val sample=List[JsValue](toJson("是") ,toJson( "否"))
-
         val atc_one = level.filter(x => x._1.as[Int]==0).map(x => x._2.map(x => (x \ "des").get)).head
         val atc_tow = level.filter(x => x._1.as[Int]==1).map(x => x._2.map(x => (x \ "des").get)).head
         val atc_three = level.filter(x => x._1.as[Int]==2).map(x => x._2.map(x => (x \ "des").get)).head
@@ -74,31 +74,45 @@ object ConfigModule extends ModuleTrait with ConfigData{
         var s_atc_two = "{id:\"2\",text:\"治疗类别II[搜索框]\",checked:\"true\",items:"+list2string(atc_tow)+"},"
         var s_atc_three = "{id:\"3\",text:\"治疗类别III[搜索框]\",checked:\"true\",items:"+list2string(atc_three)+"},"
         var s_province = "{id:\"4\",text:\"区域[搜索框]\",checked:\"true\",items:"+list2string(province)+"},"
-//        val s_sample =  "{id:\"5\",text:\"显示样本数据[搜索框]\",checked:\"true\",items:" + list2string(sample) +"}"
-        val s_sample = "{id:\"5\",text:\"显示样本报告\",checked:\"true\"}"
-
-        val u_c_it = user_category.iterator
-        val u_e_it = user_edge.iterator
-        var temp = ""
+//        val s_sample = "{id:\"5\",text:\"显示样本报告\",checked:\"true\"}"
+        var s_sample = "{id:\"5\",text:\"显示样本报告\",checked:\"true\"}"
+        
+//        val u_c_it = user_category.iterator
+//        val u_e_it = user_edge.iterator
+//        var temp = ""
 
         if (user_category.length>0){
             s_atc_one = "{id:\"1\",text:\"治疗类别I[搜索框]\",items:"+list2string(atc_one)+"},"
             s_atc_two = "{id:\"2\",text:\"治疗类别II[搜索框]\",items:"+list2string(atc_tow)+"},"
             s_atc_three = "{id:\"3\",text:\"治疗类别III[搜索框]\",items:"+list2string(atc_three)+"},"
-            while (u_c_it.hasNext){
-                temp = u_c_it.next().toString()
+            user_category.foreach{x =>
+                val temp=x.toString()
                 s_atc_one=s_atc_one.replaceFirst(temp,temp+",checked:\"true\"")
                 s_atc_two=s_atc_two.replaceFirst(temp,temp+",checked:\"true\"")
                 s_atc_three=s_atc_three.replaceFirst(temp,temp+",checked:\"true\"")
+                
             }
+//            while (u_c_it.hasNext){
+            //                temp = u_c_it.next().toString()
+            //                s_atc_one=s_atc_one.replaceFirst(temp,temp+",checked:\"true\"")
+            //                s_atc_two=s_atc_two.replaceFirst(temp,temp+",checked:\"true\"")
+            //                s_atc_three=s_atc_three.replaceFirst(temp,temp+",checked:\"true\"")
+            //            }
         }
         if (user_edge.length>0){
-            s_province = "{id:\"4\",text:\"区域[搜索框]\",items:"+list2string(province)+"}"
-            while (u_e_it.hasNext){
-                temp = u_e_it.next().toString()
+            s_province = "{id:\"4\",text:\"区域[搜索框]\",items:"+list2string(province)+"},"
+            user_edge.map{x =>
+                val temp=x.toString()
                 s_province=s_province.replaceFirst(temp,temp+",checked:\"true\"")
+                ""
             }
+//            while (u_e_it.hasNext){
+//                temp = u_e_it.next().toString()
+//                s_province=s_province.replaceFirst(temp,temp+",checked:\"true\"")
+//            }
         }
+        if(user_sample==0)
+            s_sample="{id:\"5\",text:\"显示样本报告\"}"
     
         val s_result = "["+s_atc_one+s_atc_two+s_atc_three+s_province+s_sample+"]"
     
@@ -108,16 +122,31 @@ object ConfigModule extends ModuleTrait with ConfigData{
     }
 
     def list2string(list: List[JsValue]): String ={
-        val iterable = list.iterator
-        var i = list.length
-        var string = "["
-        while (iterable.hasNext){
-            i=i+1
-            val s = i.toString
-            string += "{id:\""+s+"\",text:"+iterable.next()+"},"
+        var str = "["
+        val len=list.length
+        list.zipWithIndex.map{case(v,k) =>
+            val count=1+k+len+ ""
+            str += "{id:\""+count+"\",text:"+v+"},"
+            ""
         }
-        string = string.substring(0,string.length-1)+"]"
-        string
+        str = str.substring(0,str.length-1)+"]"
+        str
+//        val iterable = list.iterator
+//        var i = list.length
+//        var string = "["
+//        while (iterable.hasNext){
+//            i=i+1
+//            val s = i.toString
+//            string += "{id:\""+s+"\",text:"+iterable.next()+"},"
+//        }
+//        string = string.substring(0,string.length-1)+"]"
+//        string
+    }
+    def LoadConfig(implicit cm : CommonModules ): Option[List[Map[String, JsValue]]] ={
+        val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+        val config: Option[List[Map[String, JsValue]]] = Some(db.loadAllData("config"))
+        if(config.isEmpty) throw new Exception("load config error")
+        else config
     }
    
 }

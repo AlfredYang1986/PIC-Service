@@ -28,7 +28,6 @@ object TestCondition {
         conditionNum match {
             case 1 =>
                 c = ConditionUtil.one_condition_with_time(condition.head, time)
-                println(c)
             case 2 =>
                 c = ConditionUtil.two_condition_with_time(condition(0), condition(1), time)
             case 3 =>

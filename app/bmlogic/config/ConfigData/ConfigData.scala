@@ -6,7 +6,7 @@ import play.api.libs.json.Json.toJson
 import collection.JavaConversions._
 
 /**
-  * Created by apple on 6/12/17.
+  * Created by yym on 6/12/17.
   */
 trait ConfigData {
     
@@ -15,10 +15,10 @@ trait ConfigData {
 //        toJson(lst.map (x => x.iterator.toList.map(z => Map(z._1 -> z._2))).flatten)
         
         toJson(lst.map { x =>
-            Map("level" -> toJson(x.getAs[Number]("level").map(x => x.intValue()).getOrElse(throw new Exception("index error"))),
-                "parent" -> toJson(x.getAs[String]("parent").map(x => x).getOrElse(throw new Exception("index error"))),
-                "def" -> toJson(x.getAs[String]("def").map(x => x).getOrElse(throw new Exception("index error"))),
-                "des" -> toJson(x.getAs[String]("des").map(x => x).getOrElse(throw new Exception("index error")))
+            Map("level" -> toJson(x.getAs[Number]("level").map(x => x.intValue()).getOrElse(throw new Exception("level error"))),
+                "parent" -> toJson(x.getAs[String]("parent").map(x => x).getOrElse(throw new Exception("parent error"))),
+                "def" -> toJson(x.getAs[String]("def").map(x => x).getOrElse(throw new Exception("def error"))),
+                "des" -> toJson(x.getAs[String]("des").map(x => x).getOrElse(throw new Exception("des error")))
             )
 
         })

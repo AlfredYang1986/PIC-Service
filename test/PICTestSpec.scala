@@ -21,10 +21,10 @@ import play.api.libs.ws.WSClient
   */
 class PICTestSpec extends Specification with BeforeAll{
     import scala.concurrent.ExecutionContext.Implicits.global
-
+    
     val user_name = "alfred"
     val pwd = "12345"
-
+    
     /**
       * 参数说明：（Token & dbChanged）
       * 测试时把token临时调成10天 在bmlogic.auth.AuthModule.authWithPassword修改reVal值
@@ -32,7 +32,7 @@ class PICTestSpec extends Specification with BeforeAll{
       */
     var token : String = null
     val dbChanged : Boolean = false
-
+    
     /**
       * 在这里输入搜索的时间条件：
       * timeType 间隔方式：以年计=>"year";以月计=>"month"，gap：间隔长短（1表示1年或1月）
@@ -41,16 +41,16 @@ class PICTestSpec extends Specification with BeforeAll{
     val endMonth : Int = 2
     val timeType : String = "year"
     val gap : Int = 1
-
+    
     val dateYear = testUtil.timeArrInstance(endYear,endMonth,"year",gap)
     val dateMonth = testUtil.timeArrInstance(endYear,endMonth,"month",gap)
-
+    
     val marketUrl :String = "/data/calc/market"
     val trendUrl :String = "/data/calc/trend"
     val quantityUrl :String = "/data/calc/quantity"
     val percentageUrl :String = "/data/calc/percentage"
     val urlList : List[String] = List(marketUrl,trendUrl,quantityUrl)
-
+    
     var atc_one :Map[String,List[String]]= null
     var atc_two :Map[String,List[String]]= null
     var atc_three :Map[String,List[String]]= null
@@ -58,12 +58,12 @@ class PICTestSpec extends Specification with BeforeAll{
     var product :Map[String,List[String]]= null
     var edge :Map[String,List[String]]= null
     var manufacture_name :Map[String,List[String]]= null
-
+    
     val contains = "他汀类"
-
+    
     val skip = 1
     val time_out = 120
-
+    
     override def is = s2"""
         This is a PIC specification to check the 'conditionSearch' string
 
@@ -98,7 +98,7 @@ class PICTestSpec extends Specification with BeforeAll{
                 testCase3_28 result must be "ok"!                                                               $testCase3_28
                 testCase3_28_search with condition with 治疗3类 && 产品名 && 省份 && 生产商 && 月 五条件混合查询       $testCase3_28_search
                                                                               """
-
+    
     override def beforeAll(): Unit = {
         if (dbChanged){
             val listC2 = List(
@@ -135,15 +135,15 @@ class PICTestSpec extends Specification with BeforeAll{
             JsonFileUtil.writeJson(listC5_testCase3_28,"c5_testCase3_28",false)
         }
     }
-
+    
     def authToken =
-    WsTestClient.withClient { client =>
-        val result = Await.result(
-        new PICClient(client, "http://127.0.0.1:8888").authWithPasswordTest(user_name, pwd), 30.seconds)
-        token = result
-        result must_!= ""
-    }
-
+        WsTestClient.withClient { client =>
+            val result = Await.result(
+                new PICClient(client, "http://127.0.0.1:8888").authWithPasswordTest(user_name, pwd), 30.seconds)
+            token = result
+            result must_!= ""
+        }
+    
     def testCase3_15 =
         WsTestClient.withClient{client=>
             val conditions = JsonFileUtil.readJson("c2","test3_15")
@@ -182,8 +182,8 @@ class PICTestSpec extends Specification with BeforeAll{
             val result = testUtil.listFutureToString(resList,time_out)
             result must_== "ok"
         }
-
-
+    
+    
     def testCase3_17 =
         WsTestClient.withClient{client=>
             val conditions = JsonFileUtil.readJson("c2","test3_17")
@@ -222,7 +222,7 @@ class PICTestSpec extends Specification with BeforeAll{
             val result = testUtil.listFutureToString(resList,time_out)
             result must_== "ok"
         }
-
+    
     def testCase3_19 =
         WsTestClient.withClient{client=>
             val conditions = JsonFileUtil.readJson("c2","test3_19")
@@ -261,198 +261,193 @@ class PICTestSpec extends Specification with BeforeAll{
             val result = testUtil.listFutureToString(resList,time_out)
             result must_== "ok"
         }
-
+    
     def testCase3_21 =
-    WsTestClient.withClient{client=>
-        val conditions = JsonFileUtil.readJson("c3","test3_21")
-        val listStr = urlList.map{ url =>
-            println(s"&&3_21_url=>${url}&&")
-            val res = twoConditionCombination(client,url,token,conditions,60)
-            println(s"&&3_21_u_res=>${res}&&")
-            res
+        WsTestClient.withClient{client=>
+            val conditions = JsonFileUtil.readJson("c3","test3_21")
+            val listStr = urlList.map{ url =>
+                println(s"&&3_21_url=>${url}&&")
+                val res = twoConditionCombination(client,url,token,conditions,60)
+                println(s"&&3_21_u_res=>${res}&&")
+                res
+            }
+            val result = testUtil.listStrToStr(listStr,time_out)
+            result must_== "ok"
         }
-        val result = testUtil.listStrToStr(listStr,time_out)
-        result must_== "ok"
-    }
     def testCase3_21_search =
-    WsTestClient.withClient { client =>
-        val conditions = JsonFileUtil.readJson("c3","test3_21")
-        val resList = new PICClient(client, "http://127.0.0.1:8888").conditionSearchResult(token, conditions, skip, contains)
-        val result = testUtil.listFutureToString(resList,time_out)
-        result must_== "ok"
-    }
-
+        WsTestClient.withClient { client =>
+            val conditions = JsonFileUtil.readJson("c3","test3_21")
+            val resList = new PICClient(client, "http://127.0.0.1:8888").conditionSearchResult(token, conditions, skip, contains)
+            val result = testUtil.listFutureToString(resList,time_out)
+            result must_== "ok"
+        }
+    
     def testCase3_22 =
-    WsTestClient.withClient{client=>
-        val conditions = JsonFileUtil.readJson("c3","test3_22")
-        val listStr = urlList.map{ url =>
-            println(s"&&3_22_url=>${url}&&")
-            val res = twoConditionCombination(client,url,token,conditions,60)
-            println(s"&&3_22_u_res=>${res}&&")
-            res
+        WsTestClient.withClient{client=>
+            val conditions = JsonFileUtil.readJson("c3","test3_22")
+            val listStr = urlList.map{ url =>
+                println(s"&&3_22_url=>${url}&&")
+                val res = twoConditionCombination(client,url,token,conditions,60)
+                println(s"&&3_22_u_res=>${res}&&")
+                res
+            }
+            val result = testUtil.listStrToStr(listStr,time_out)
+            result must_== "ok"
         }
-        val result = testUtil.listStrToStr(listStr,time_out)
-        result must_== "ok"
-    }
-
+    
     def testCase3_22_search =
-    WsTestClient.withClient { client =>
-        val conditions = JsonFileUtil.readJson("c3","test3_22")
-
-        val resList = new PICClient(client, "http://127.0.0.1:8888").conditionSearchResult(token, conditions, skip, contains)
-
-        val result = testUtil.listFutureToString(resList,time_out)
-
-        result must_== "ok"
-    }
-
+        WsTestClient.withClient { client =>
+            val conditions = JsonFileUtil.readJson("c3","test3_22")
+            
+            val resList = new PICClient(client, "http://127.0.0.1:8888").conditionSearchResult(token, conditions, skip, contains)
+            
+            val result = testUtil.listFutureToString(resList,time_out)
+            
+            result must_== "ok"
+        }
+    
     def testCase3_23 =
-    WsTestClient.withClient{client=>
-        val conditions = JsonFileUtil.readJson("c3","test3_23")
-        val listStr = urlList.map{ url =>
-            println(s"&&3_23_url=>${url}&&")
-            val res = twoConditionCombination(client,url,token,conditions,60)
-            println(s"&&3_23_u_res=>${res}&&")
-            res
+        WsTestClient.withClient{client=>
+            val conditions = JsonFileUtil.readJson("c3","test3_23")
+            val listStr = urlList.map{ url =>
+                println(s"&&3_23_url=>${url}&&")
+                val res = twoConditionCombination(client,url,token,conditions,60)
+                println(s"&&3_23_u_res=>${res}&&")
+                res
+            }
+            val result = testUtil.listStrToStr(listStr,time_out)
+            result must_== "ok"
         }
-        val result = testUtil.listStrToStr(listStr,time_out)
-        result must_== "ok"
-    }
-
+    
     def testCase3_23_search =
-    WsTestClient.withClient { client =>
-        val conditions = JsonFileUtil.readJson("c3","test3_23")
-
-        val resList = new PICClient(client, "http://127.0.0.1:8888").conditionSearchResult(token, conditions, skip, contains)
-
-        val result = testUtil.listFutureToString(resList,time_out)
-
-        result must_== "ok"
-    }
-
+        WsTestClient.withClient { client =>
+            val conditions = JsonFileUtil.readJson("c3","test3_23")
+            
+            val resList = new PICClient(client, "http://127.0.0.1:8888").conditionSearchResult(token, conditions, skip, contains)
+            
+            val result = testUtil.listFutureToString(resList,time_out)
+            
+            result must_== "ok"
+        }
+    
     def testCase3_24 =
-    WsTestClient.withClient{client=>
-        val conditions = JsonFileUtil.readJson("c3","test3_24")
-        val listStr = urlList.map{ url =>
-            println(s"&&3_24_url=>${url}&&")
-            val res = twoConditionCombination(client,url,token,conditions,60)
-            println(s"&&3_24_u_res=>${res}&&")
-            res
+        WsTestClient.withClient{client=>
+            val conditions = JsonFileUtil.readJson("c3","test3_24")
+            val listStr = urlList.map{ url =>
+                println(s"&&3_24_url=>${url}&&")
+                val res = twoConditionCombination(client,url,token,conditions,60)
+                println(s"&&3_24_u_res=>${res}&&")
+                res
+            }
+            val result = testUtil.listStrToStr(listStr,time_out)
+            result must_== "ok"
         }
-        val result = testUtil.listStrToStr(listStr,time_out)
-        result must_== "ok"
-    }
-
+    
     def testCase3_24_search =
-    WsTestClient.withClient { client =>
-        val conditions = JsonFileUtil.readJson("c3","test3_24")
-
-        val resList = new PICClient(client, "http://127.0.0.1:8888").conditionSearchResult(token, conditions, skip, contains)
-
-        val result = testUtil.listFutureToString(resList,time_out)
-
-        result must_== "ok"
-    }
-
+        WsTestClient.withClient { client =>
+            val conditions = JsonFileUtil.readJson("c3","test3_24")
+            
+            val resList = new PICClient(client, "http://127.0.0.1:8888").conditionSearchResult(token, conditions, skip, contains)
+            
+            val result = testUtil.listFutureToString(resList,time_out)
+            
+            result must_== "ok"
+        }
+    
     def testCase3_25 =
-    WsTestClient.withClient{client=>
-        val conditions = JsonFileUtil.readJson("c4_testCase3_25","test3_25")
-        val listStr = urlList.map{ url =>
-            val res = twoConditionCombination(client,url,token,conditions,60)
-            res
+        WsTestClient.withClient{client=>
+            val conditions = JsonFileUtil.readJson("c4_testCase3_25","test3_25")
+            val listStr = urlList.map{ url =>
+                val res = twoConditionCombination(client,url,token,conditions,60)
+                res
+            }
+            val result = testUtil.listStrToStr(listStr,time_out)
+            result must_== "ok"
         }
-        val result = testUtil.listStrToStr(listStr,time_out)
-        result must_== "ok"
-    }
-
+    
     def testCase3_25_search =
-    WsTestClient.withClient { client =>
-        val conditions = JsonFileUtil.readJson("c4_testCase3_25","test3_25")
-
-        val resList = new PICClient(client, "http://127.0.0.1:8888").conditionSearchResult(token, conditions, skip, contains)
-
-        val result = testUtil.listFutureToString(resList,time_out)
-
-        result must_== "ok"
-    }
-
+        WsTestClient.withClient { client =>
+            val conditions = JsonFileUtil.readJson("c4_testCase3_25","test3_25")
+            
+            val resList = new PICClient(client, "http://127.0.0.1:8888").conditionSearchResult(token, conditions, skip, contains)
+            
+            val result = testUtil.listFutureToString(resList,time_out)
+            
+            result must_== "ok"
+        }
+    
     def testCase3_26 =
-    WsTestClient.withClient{client=>
-        val conditions = JsonFileUtil.readJson("c4_testCase3_26","test3_26")
-        val listStr = urlList.map{ url =>
-            val res = twoConditionCombination(client,url,token,conditions,60)
-            res
+        WsTestClient.withClient{client=>
+            val conditions = JsonFileUtil.readJson("c4_testCase3_26","test3_26")
+            val listStr = urlList.map{ url =>
+                val res = twoConditionCombination(client,url,token,conditions,60)
+                res
+            }
+            val result = testUtil.listStrToStr(listStr,time_out)
+            result must_== "ok"
         }
-        val result = testUtil.listStrToStr(listStr,time_out)
-        result must_== "ok"
-    }
-
+    
     def testCase3_26_search =
-    WsTestClient.withClient { client =>
-        val conditions = JsonFileUtil.readJson("c4_testCase3_26","test3_26")
-        val resList = new PICClient(client, "http://127.0.0.1:8888").conditionSearchResult(token, conditions, skip, contains)
-
-        val result = testUtil.listFutureToString(resList,time_out)
-
-        result must_== "ok"
-    }
-
+        WsTestClient.withClient { client =>
+            val conditions = JsonFileUtil.readJson("c4_testCase3_26","test3_26")
+            val resList = new PICClient(client, "http://127.0.0.1:8888").conditionSearchResult(token, conditions, skip, contains)
+            
+            val result = testUtil.listFutureToString(resList,time_out)
+            
+            result must_== "ok"
+        }
+    
     def testCase3_27 =
-    WsTestClient.withClient{client=>
-        val conditions = JsonFileUtil.readJson("c5_testCase3_27","test3_27")
-        val listStr = urlList.map{ url =>
-            val res = twoConditionCombination(client,url,token,conditions,60)
-            res
+        WsTestClient.withClient{client=>
+            val conditions = JsonFileUtil.readJson("c5_testCase3_27","test3_27")
+            val listStr = urlList.map{ url =>
+                val res = twoConditionCombination(client,url,token,conditions,60)
+                res
+            }
+            val result = testUtil.listStrToStr(listStr,time_out)
+            result must_== "ok"
         }
-        val result = testUtil.listStrToStr(listStr,time_out)
-        result must_== "ok"
-    }
-
+    
     def testCase3_27_search =
-    WsTestClient.withClient { client =>
-        val conditions = JsonFileUtil.readJson("c5_testCase3_27","test3_27")
-
-        val resList = new PICClient(client, "http://127.0.0.1:8888").conditionSearchResult(token, conditions, skip, contains)
-
-        val result = testUtil.listFutureToString(resList,time_out)
-
-        result must_== "ok"
-    }
-
-    def testCase3_28 =
-    WsTestClient.withClient{client=>
-        val conditions = JsonFileUtil.readJson("c5_testCase3_28","test3_28")
-        val listStr = urlList.map{ url =>
-            val res = twoConditionCombination(client,url,token,conditions,60)
-            res
+        WsTestClient.withClient { client =>
+            val conditions = JsonFileUtil.readJson("c5_testCase3_27","test3_27")
+            
+            val resList = new PICClient(client, "http://127.0.0.1:8888").conditionSearchResult(token, conditions, skip, contains)
+            
+            val result = testUtil.listFutureToString(resList,time_out)
+            
+            result must_== "ok"
         }
-        val result = testUtil.listStrToStr(listStr,time_out)
-        result must_== "ok"
-    }
-
+    
+    def testCase3_28 =
+        WsTestClient.withClient{client=>
+            val conditions = JsonFileUtil.readJson("c5_testCase3_28","test3_28")
+            val listStr = urlList.map{ url =>
+                val res = twoConditionCombination(client,url,token,conditions,60)
+                res
+            }
+            val result = testUtil.listStrToStr(listStr,time_out)
+            result must_== "ok"
+        }
+    
     def testCase3_28_search =
-    WsTestClient.withClient { client =>
-        val conditions = JsonFileUtil.readJson("c5_testCase3_28","test3_28")
-
-        val resList = new PICClient(client, "http://127.0.0.1:8888").conditionSearchResult(token, conditions, skip, contains)
-
-        val result = testUtil.listFutureToString(resList,time_out)
-
-        result must_== "ok"
-    }
-
+        WsTestClient.withClient { client =>
+            val conditions = JsonFileUtil.readJson("c5_testCase3_28","test3_28")
+            
+            val resList = new PICClient(client, "http://127.0.0.1:8888").conditionSearchResult(token, conditions, skip, contains)
+            
+            val result = testUtil.listFutureToString(resList,time_out)
+            
+            result must_== "ok"
+        }
+    
     def twoConditionCombination(client:WSClient,conditionSearchUrl:String,token:String,lists:List[Map[String,JsValue]] ,time_out:Int): String ={
-//        println(s"&&conditions.length=>${lists.length}&&")
         val resArr=lists.map{condition=>
-//            println(s"&&3_16_condition=>${condition}&&")
             val res=Await.result(
-            new PICClient(client, "http://127.0.0.1:8888").oneCondition(token,condition,conditionSearchUrl), 60.seconds)
-//            println(s"&&3_16_c_res=>${res}&&")
+                new PICClient(client, "http://127.0.0.1:8888").oneCondition(token,condition,conditionSearchUrl), 60.seconds)
             res
         }.toArray
-//        println(s"&&resArr.length=>${resArr.length}&&")
-//        resArr.foreach(x => println(s"结果：${x}"))
         testUtil.finalResult(resArr)
     }
-
+    
 }

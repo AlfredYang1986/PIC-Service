@@ -548,7 +548,6 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 			
 		} catch {
 			case ex: Exception =>
-				println(ex)
 				(None, Some(ErrorCode.errorToJson(ex.getMessage)))
 		}
 	}
