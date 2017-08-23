@@ -24,6 +24,7 @@ object AuthModule extends ModuleTrait with AuthData {
         case msg_AuthPushUser(data) => authPushUser(data)
 		case msg_AuthWithPassword(data) => authWithPassword(data)
         case msg_AuthTokenParser(data) => authTokenPraser(data)
+        case msg_getAuthUserName(data) => getAuthUserName(data)
         
         case msg_CheckAuthTokenTest(data) => checkAuthTokenTest(data)(pr)
         case msg_CheckTokenExpire(data) => checkAuthTokenExpire(data)(pr)
@@ -122,11 +123,22 @@ object AuthModule extends ModuleTrait with AuthData {
     def authTokenPraser(data : JsValue)(implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
         try {
             val att = cm.modules.get.get("att").map (x => x.asInstanceOf[AuthTokenTrait]).getOrElse(throw new Exception("no encrypt impl"))
-
             val auth_token = (data \ "token").asOpt[String].map (x => x).getOrElse(throw new Exception("input error"))
             val auth = att.decrypt2JsValue(auth_token)
             (Some(Map("auth" -> auth)), None)
 
+        } catch {
+            case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+    def getAuthUserName(data : JsValue)(implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+        try {
+            val att = cm.modules.get.get("att").map (x => x.asInstanceOf[AuthTokenTrait]).getOrElse(throw new Exception("no encrypt impl"))
+            val auth_token = (data \ "token").asOpt[String].map (x => x).getOrElse(throw new Exception("input error"))
+            val auth = att.decrypt2JsValue(auth_token)
+            val userName=(auth \ "user_name").get
+            (Some(Map("user" -> userName)), None)
+            
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }

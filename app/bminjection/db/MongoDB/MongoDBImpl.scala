@@ -1,26 +1,41 @@
 package bminjection.db.MongoDB
 
+import java.util.UUID
+
 import bminjection.db.DBTrait
 import bmutil.dao.{_data_connection, from}
+import bmutil.logging.bmutil.logging.LogImpl
 import com.mongodb.casbah
 import com.mongodb.casbah.Imports._
 import play.api.libs.json.JsValue
 
 trait MongoDBImpl extends DBTrait {
-
-    override def insertObject(obj : DBObject, db_name : String, primary_key : String) : Unit = {
-        val primary = obj.get(primary_key) //.map (x => x).getOrElse(throw new Exception("get primary key error"))
+    this:LogImpl=>
+    override def insertObject(obj : DBObject, db_name : String, primary_key : String)(user : String)  : Unit = {
+        val primary = obj.get(primary_key)//.map (x => x).getOrElse(throw new Exception("get primary key error"))
+        val log_str=s"[${UUID.randomUUID()}] Operation: insert ${obj.toString} | db: $db_name | Condition: ${(primary_key -> primary).toString()}"
         (from db() in db_name where (primary_key -> primary) select(x => x)).toList match {
-            case Nil => _data_connection.getCollection(db_name) += obj
-            case _ => throw new Exception("primary key error")
+            case Nil =>
+                this.DBRolling(s"#START# $log_str", user)
+                _data_connection.getCollection(db_name) += obj
+                this.DBRolling(s"#END# $log_str", user)
+            case _ =>
+                this.DBRolling(s"#ERROR# $log_str", user)
+                throw new Exception("primary key error")
         }
     }
 
-    override def updateObject(obj : DBObject, db_name : String, primary_key : String) : Unit = {
+    override def updateObject(obj : DBObject, db_name : String, primary_key : String)(user : String)  : Unit = {
         val primary = obj.get(primary_key) //.map (x => x).getOrElse(throw new Exception("get primary key error"))
+        val log_str=s"[${UUID.randomUUID()}] Operation: update ${obj.toString} | db: $db_name | Condition: ${(primary_key -> primary).toString()}"
         (from db() in db_name where (primary_key -> primary) select(x =>x)).toList match {
-            case head :: Nil => _data_connection.getCollection(db_name).update(head, obj)
-            case _ => throw new Exception("primary key error")
+            case head :: Nil =>
+                this.DBRolling(s"#START# $log_str", user)
+                _data_connection.getCollection(db_name).update(head, obj)
+                this.DBRolling(s"#END# $log_str", user)
+            case _ =>
+                this.DBRolling(s"#ERROR# $log_str", user)
+                throw new Exception("primary key error")
         }
     }
 
@@ -41,7 +56,7 @@ trait MongoDBImpl extends DBTrait {
     
     override def queryAllObject(db_name: String,skip: Int=0, take: Int=20)
                                (implicit t: DBObject => Map[String, JsValue]): List[Map[String, JsValue]] = {
-        (from db() in db_name ).selectSkipTopLoc(skip)(take)(x => t(x)).toList
+        (from db() in db_name).selectSkipTopLoc(skip)(take)(x => t(x)).toList
     }
     override def loadAllData(db_name:String)
                             (implicit t: DBObject => Map[String, JsValue]): List[Map[String, JsValue]] = {
@@ -49,11 +64,17 @@ trait MongoDBImpl extends DBTrait {
     }
     
  
-    override def deleteObject(obj: DBObject, db_name: String, primary_key: String): Unit = {
+    override def deleteObject(obj : DBObject, db_name: String, primary_key: String)(user : String) : Unit = {
         val primary = obj.get(primary_key) //.map (x => x).getOrElse(throw new Exception("get primary key error"))
+        val log_str=s"[${UUID.randomUUID()}] Operation: delete ${obj.toString} | db: $db_name | Condition: ${(primary_key -> primary).toString()}"
         (from db() in db_name where (primary_key -> primary) select(x =>x)).toList match {
-            case head :: Nil => _data_connection.getCollection(db_name) -= head
-            case _ => throw new Exception("primary key error")
+            case head :: Nil =>
+                this.DBRolling(s"#START# $log_str", user)
+                _data_connection.getCollection(db_name) -= head
+                this.DBRolling(s"#END# $log_str", user)
+            case _ =>
+                this.DBRolling(s"#ERROR# $log_str", user)
+                throw new Exception("primary key error")
         }
     }
 

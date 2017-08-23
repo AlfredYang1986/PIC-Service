@@ -6,9 +6,12 @@ import play.api.libs.json.JsValue
 /**
   * Created by alfredyang on 01/06/2017.
   */
+
+
+
 trait DBTrait {
-    def insertObject(obj : DBObject, db_name : String, primary_key : String) : Unit
-    def updateObject(obj : DBObject, db_name : String, primary_key : String) : Unit
+    def insertObject(obj : DBObject, db_name : String, primary_key : String)(user : String) : Unit
+    def updateObject(obj : DBObject, db_name : String, primary_key : String)(user : String)  : Unit
 
     def queryObject(condition : DBObject, db_name : String)
                    (implicit t : DBObject => Map[String, JsValue]) : Option[Map[String, JsValue]]
@@ -25,7 +28,7 @@ trait DBTrait {
     def aggregate(condition : DBObject, db_name : String, group : DBObject)
                  (implicit t : DBObject => Map[String, JsValue]) : Option[Map[String, JsValue]]
    
-    def deleteObject(obj : DBObject, db_name : String, primary_key : String) : Unit
+    def deleteObject(obj : DBObject, db_name : String, primary_key : String)(user : String)  : Unit
 
 
     def restoreDatabase() = ???
