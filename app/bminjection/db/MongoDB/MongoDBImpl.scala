@@ -4,37 +4,37 @@ import java.util.UUID
 
 import bminjection.db.DBTrait
 import bmutil.dao.{_data_connection, from}
-import bmutil.logging.bmutil.logging.LogImpl
+import bmutil.logging.LogImpl
 import com.mongodb.casbah
 import com.mongodb.casbah.Imports._
 import play.api.libs.json.JsValue
 
 trait MongoDBImpl extends DBTrait {
     this:LogImpl=>
-    override def insertObject(obj : DBObject, db_name : String, primary_key : String)(user : String)  : Unit = {
+    override def insertObject(obj : DBObject, db_name : String, primary_key : String) : Unit = {
         val primary = obj.get(primary_key)//.map (x => x).getOrElse(throw new Exception("get primary key error"))
         val log_str=s"[${UUID.randomUUID()}] Operation: insert ${obj.toString} | db: $db_name | Condition: ${(primary_key -> primary).toString()}"
         (from db() in db_name where (primary_key -> primary) select(x => x)).toList match {
             case Nil =>
-                this.DBRolling(s"#START# $log_str", user)
+                this.DBRolling(s"#START# $log_str")
                 _data_connection.getCollection(db_name) += obj
-                this.DBRolling(s"#END# $log_str", user)
+                this.DBRolling(s"#END# $log_str")
             case _ =>
-                this.DBRolling(s"#ERROR# $log_str", user)
+                this.DBRolling(s"#ERROR# $log_str")
                 throw new Exception("primary key error")
         }
     }
 
-    override def updateObject(obj : DBObject, db_name : String, primary_key : String)(user : String)  : Unit = {
+    override def updateObject(obj : DBObject, db_name : String, primary_key : String)  : Unit = {
         val primary = obj.get(primary_key) //.map (x => x).getOrElse(throw new Exception("get primary key error"))
         val log_str=s"[${UUID.randomUUID()}] Operation: update ${obj.toString} | db: $db_name | Condition: ${(primary_key -> primary).toString()}"
         (from db() in db_name where (primary_key -> primary) select(x =>x)).toList match {
             case head :: Nil =>
-                this.DBRolling(s"#START# $log_str", user)
+                this.DBRolling(s"#START# $log_str")
                 _data_connection.getCollection(db_name).update(head, obj)
-                this.DBRolling(s"#END# $log_str", user)
+                this.DBRolling(s"#END# $log_str")
             case _ =>
-                this.DBRolling(s"#ERROR# $log_str", user)
+                this.DBRolling(s"#ERROR# $log_str")
                 throw new Exception("primary key error")
         }
     }
@@ -64,16 +64,16 @@ trait MongoDBImpl extends DBTrait {
     }
     
  
-    override def deleteObject(obj : DBObject, db_name: String, primary_key: String)(user : String) : Unit = {
+    override def deleteObject(obj : DBObject, db_name: String, primary_key: String) : Unit = {
         val primary = obj.get(primary_key) //.map (x => x).getOrElse(throw new Exception("get primary key error"))
         val log_str=s"[${UUID.randomUUID()}] Operation: delete ${obj.toString} | db: $db_name | Condition: ${(primary_key -> primary).toString()}"
         (from db() in db_name where (primary_key -> primary) select(x =>x)).toList match {
             case head :: Nil =>
-                this.DBRolling(s"#START# $log_str", user)
+                this.DBRolling(s"#START# $log_str")
                 _data_connection.getCollection(db_name) -= head
-                this.DBRolling(s"#END# $log_str", user)
+                this.DBRolling(s"#END# $log_str")
             case _ =>
-                this.DBRolling(s"#ERROR# $log_str", user)
+                this.DBRolling(s"#ERROR# $log_str")
                 throw new Exception("primary key error")
         }
     }

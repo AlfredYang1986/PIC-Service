@@ -14,6 +14,7 @@ import bmmessages.CommonModules
 import bmpattern.ModuleTrait
 import bmutil.MergeJs
 import bmutil.errorcode.ErrorCode
+import bmutil.logging.PharbersLog
 
 import scala.collection.immutable.Map
 import com.mongodb.casbah.Imports._
@@ -54,6 +55,7 @@ object AuthModule extends ModuleTrait with AuthData {
             o += "date" -> date.asInstanceOf[Number]
             o += "updateDate" -> date.asInstanceOf[Number]
             
+            val user=(data \ "user").get.as[String]
             db.insertObject(o, "users", "user_name")
             val result = toJson(o - "pwd" - "phoneNo" - "email" - "date" - "createDate" - "updateDate" - "status" + ("expire_in" -> toJson(date + 60 * 60 * 1000 * 24))) // token 默认一天过期
             val auth_token = att.encrypt2Token(toJson(result))
@@ -72,13 +74,14 @@ object AuthModule extends ModuleTrait with AuthData {
     def authWithPassword(data : JsValue)(implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
 		try {
 			val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+            val plog=cm.modules.get.get("plog").map(x => x.asInstanceOf[PharbersLog]).getOrElse(throw new Exception("can't get log"))
 			val user_name = (data \ "user_name").asOpt[String].map (x => x).getOrElse(throw new Exception("input error"))
 			val pwd = (data \ "pwd").asOpt[String].map (x => x).getOrElse(throw new Exception("input error"))
 			val result = db.queryObject($and("user_name" -> user_name, "pwd" -> pwd), "users")
             val date = new Date().getTime
             if (result.isEmpty) throw new Exception("unkonw error")
 			else {
-                
+                plog.out2file("user login pic", user_name)
                 val att = cm.modules.get.get("att").map (x => x.asInstanceOf[AuthTokenTrait]).getOrElse(throw new Exception("no encrypt impl"))
                 val reVal = result.get + ("expire_in" -> toJson(date + 60 * 60 * 1000 * 24 * 10))//临时改为10天的token期限
                 val auth_token = att.encrypt2Token(toJson(reVal))

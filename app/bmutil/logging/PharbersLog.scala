@@ -3,44 +3,39 @@ package bmutil.logging
 /**
   * Created by yym on 8/23/17.
   */
-package bmutil.logging
 
-
+import java.util.logging.LogManager
 
 import org.apache.log4j.Logger
 
 import scala.xml.XML
-
-/**
-  * Created by yym on 8/17/17.
-  */
 
 trait PharbersLog{
 //    var usersInfo : List[String] = Nil // read config
     var current :String = "" // read config
     def out2console(message : AnyRef, developer_name:String): Unit
     def out2file(message : AnyRef, user_name: String): Unit
-    def DBRolling(message : AnyRef, user_name: String):Unit
+    def DBRolling(message : AnyRef):Unit
 }
 
 trait LogImpl extends PharbersLog {
     current=readUser("conf/UsersLoggingInfo.xml")
+    
+    
+    
     override def out2console(message: AnyRef, developer_name: String): Unit = {
-        val logger=Logger.getLogger("console")
+        val consolelogger=Logger.getLogger("console")
         if(developer_name == current)
-            logger.debug("["+ current +"]" +message )
+            consolelogger.debug("["+ current +"]" +message )
     }
     override def out2file(message: AnyRef, user_name: String): Unit = {
-        val logger=Logger.getLogger("file")
-        if(logger.isInfoEnabled){
-            logger.info("["+ user_name +"]" +message )
-        }
+        val filelogger=Logger.getLogger("file")
+        filelogger.info("["+ user_name +"]" +message )
+        
     }
-    override def DBRolling(message: AnyRef, user_name: String): Unit = {
-        val logger=Logger.getLogger("file")
-        if(logger.isInfoEnabled){
-            logger.info("["+ user_name +"]" +message)
-        }
+    override def DBRolling(message: AnyRef): Unit = {
+        val DBRollinglogger=Logger.getLogger("rollingFile")
+        DBRollinglogger.info(message)
     }
     def readUser(file:String) : String ={
         try{
