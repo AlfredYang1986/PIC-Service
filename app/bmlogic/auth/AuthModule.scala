@@ -60,7 +60,7 @@ object AuthModule extends ModuleTrait with AuthData {
             val result = toJson(o - "pwd" - "phoneNo" - "email" - "date" - "createDate" - "updateDate" - "status" + ("expire_in" -> toJson(date + 60 * 60 * 1000 * 24))) // token 默认一天过期
             val auth_token = att.encrypt2Token(toJson(result))
             val reVal = toJson(o - "user_id" - "pwd" - "phoneNo" - "email" - "date" - "createDate" - "updateDate" - "status" - "scope")
-
+            
             (Some(Map(
                 "auth_token" -> toJson(auth_token),
                 "user" -> reVal
@@ -82,6 +82,7 @@ object AuthModule extends ModuleTrait with AuthData {
             if (result.isEmpty) throw new Exception("unkonw error")
 			else {
                 plog.out2file("user login pic", user_name)
+                plog.out2console("aaa,","YangMei")
                 val att = cm.modules.get.get("att").map (x => x.asInstanceOf[AuthTokenTrait]).getOrElse(throw new Exception("no encrypt impl"))
                 val reVal = result.get + ("expire_in" -> toJson(date + 60 * 60 * 1000 * 24 * 10))//临时改为10天的token期限
                 val auth_token = att.encrypt2Token(toJson(reVal))

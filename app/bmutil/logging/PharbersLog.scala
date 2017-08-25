@@ -20,13 +20,14 @@ trait PharbersLog{
 
 trait LogImpl extends PharbersLog {
     current=readUser("conf/UsersLoggingInfo.xml")
-    
-    
-    
+ 
     override def out2console(message: AnyRef, developer_name: String): Unit = {
         val consolelogger=Logger.getLogger("console")
+        println(current)
         if(developer_name == current)
-            consolelogger.debug("["+ current +"]" +message )
+            
+                consolelogger.debug("["+ current +"]" +message )
+        
     }
     override def out2file(message: AnyRef, user_name: String): Unit = {
         val filelogger=Logger.getLogger("file")
@@ -39,8 +40,8 @@ trait LogImpl extends PharbersLog {
     }
     def readUser(file:String) : String ={
         try{
-            val xml=XML.load(file)
-            val current=(xml \ "root" \ "host").map(x => x.text).head
+            val xml=XML.loadFile(file)
+            val current=(xml \"host").map(x => x.text).head
             current
         }catch {
             case ex :Exception=>
