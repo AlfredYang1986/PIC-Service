@@ -5,39 +5,36 @@
 
 package bmutil.dao
 
+import bmutil.databaseConfig._
 import com.mongodb.casbah.MongoCursor
 import com.mongodb.casbah.Imports._
 
 object _data_connection {
-	def conn_name : String = "PIC"
+	def conn_name : String = db
 
-//	val addr = new com.mongodb.casbah.Imports.ServerAddress("localhost", 2017)
-//	val credentialsList = MongoCredential.createPlainCredential("dongdamaster", conn_name, "dongda@master".toCharArray)
-//    val _conn = MongoClient(addr, List(credentialsList))
-	val _conn = MongoClient()(conn_name)
+	val addr = new ServerAddress(dbhost, dbport.toInt)
+	val credentialsList = MongoCredential.createScramSha1Credential(dbuser, conn_name, dbpwd.toCharArray)
+	val _conn = MongoClient(addr, List(credentialsList))
 
 	var _conntion : Map[String, MongoCollection] = Map.empty
-	
+
 	def getCollection(coll_name : String) : MongoCollection = {
-//		if (!_conntion.contains(coll_name)) _conntion += (coll_name -> _conn(conn_name)(coll_name))
-		if (!_conntion.contains(coll_name)) _conntion += (coll_name -> _conn(coll_name))
+		if (!_conntion.contains(coll_name)) _conntion += (coll_name -> _conn(conn_name)(coll_name))
 
 		_conntion.get(coll_name).get
 	}
-	
+
 	def resetCollection(coll_name : String) : Unit = getCollection(coll_name).drop
-	
+
 	def isExisted(coll_name : String) : Boolean = !(getCollection(coll_name).isEmpty)
-	
+
 	def releaseConntions = _conntion = Map.empty
 }
 
 trait IDatabaseContext {
 	var coll_name : String = null
 
-	protected def openConnection : MongoCollection =
-		_data_connection._conn(coll_name)
-//	  	_data_connection._conn(_data_connection.conn_name)(coll_name)
+	protected def openConnection : MongoCollection = _data_connection._conn(_data_connection.conn_name)(coll_name)
 	protected def closeConnection = null
 }
 
@@ -143,20 +140,18 @@ class AMongoDBLINQ extends IDatabaseContext {
 		nc
 	}
 	
-	
-
 	def selectCursor : MongoCursor = openConnection.find(w)
 
-    /**
-      * TODO: 后期需要优化
-      */
-    def aggregate(group : MongoDBObject) : DBObject = {
-        val pipeline = MongoDBList(MongoDBObject("$match" -> w)) ++
-                        MongoDBList(MongoDBObject("$group" -> group))
+	/**
+	  * TODO: 后期需要优化
+	  */
+	def aggregate(group : MongoDBObject) : DBObject = {
+		val pipeline = MongoDBList(MongoDBObject("$match" -> w)) ++
+			MongoDBList(MongoDBObject("$group" -> group))
 
-        val a = _data_connection._conn
-        a.command(MongoDBObject("aggregate" -> coll_name, "pipeline" -> pipeline))
-    }
+		val a = _data_connection._conn(_data_connection.conn_name)
+		a.command(MongoDBObject("aggregate" -> coll_name, "pipeline" -> pipeline))
+	}
 
 	def count : Int = openConnection.count(w)
 }

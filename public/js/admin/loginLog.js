@@ -84,25 +84,25 @@ function log(){
 		columns: [{
 	         field: "user_name",
 	         title: "用户名",
-	         width: 120
+	         width: '20%'
 	     },{
 	         field: "date",
 	         title: "登入时间",
 	         format: "{0: yyyy-MM-dd HH:mm:ss}", //格式化时间  
-	         width: 120
+	         width: '20%'
 	     },{
 	         field: "login_end",
 	         title: "登出时间",
 	         format: "{0: yyyy-MM-dd HH:mm:ss}", //格式化时间
-	         width: 120
+	         width: '20%'
 	     },{
 	         field: "time_sum",
 	         title: "停留时长",
-	         width: 120
+	         width: '20%'
 	     },{
 	         field: "ip",
 	         title: "登录IP",
-	     	 width: 120
+	     	 width: '20%'
 	     }],
 		dataBound : function() {
 			var rows = this.items();
