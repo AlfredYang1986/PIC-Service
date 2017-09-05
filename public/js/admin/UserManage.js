@@ -312,26 +312,27 @@ function saveUserAuth(userId){
 }
 
 function checkedNodeIds(nodes, checkedNodes) {
-    for (var i = 0; i < nodes.length -1; i++) {
-    	if (nodes[i].checked && nodes[i].hasChildren == false) {
-    		if(nodes[i].id < 30){
-    			console.log(checkedNodes.push("c-"+nodes[i].text))
-    			 checkedNodes.push("c-"+nodes[i].text);
-    		}else{
-    			 checkedNodes.push("e-"+nodes[i].text);
-    		}
+    for (var i = 0; i < nodes.length; i++) {
+        if (nodes[i].checked && nodes[i].hasChildren == false && nodes[i].text!="显示样本报告") {
+            if(nodes[i].id < 30){
+                checkedNodes.push("c-"+nodes[i].text);
+            }else{
+                checkedNodes.push("e-"+nodes[i].text);
+            }
         }
         if (nodes[i].hasChildren) {
-        	 checkedNodeIds(nodes[i].children.view(), checkedNodes);
+            checkedNodeIds(nodes[i].children.view(), checkedNodes);
         }
     }
     var beforeLen=nodes.length -1;
-    if(nodes[beforeLen].checked){
-        checkedNodes.push("s-" + "1");
-	}else {
-        checkedNodes.push("s-" + "0");
-	}
-	return checkedNodes;
+    if(nodes[beforeLen].text=="显示样本报告"){
+        if(nodes[beforeLen].checked){
+            checkedNodes.push("s-" + "1");
+        }else {
+            checkedNodes.push("s-" + "0");
+        }
+    }
+    return checkedNodes;
 }
 
 function cancelUserAuth(){
