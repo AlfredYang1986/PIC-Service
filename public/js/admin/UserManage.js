@@ -315,6 +315,7 @@ function checkedNodeIds(nodes, checkedNodes) {
     for (var i = 0; i < nodes.length -1; i++) {
     	if (nodes[i].checked && nodes[i].hasChildren == false) {
     		if(nodes[i].id < 30){
+    			console.log(checkedNodes.push("c-"+nodes[i].text))
     			 checkedNodes.push("c-"+nodes[i].text);
     		}else{
     			 checkedNodes.push("e-"+nodes[i].text);

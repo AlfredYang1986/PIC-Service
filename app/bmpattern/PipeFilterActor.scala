@@ -14,7 +14,7 @@ import bmmessages._
 import bmlogic.auth.{AuthModule, msg_AuthCommand}
 import bmlogic.category.{CategoryModule, msg_CategoryCommand}
 import bmlogic.config.{ConfigModule, msg_ConfigCommand}
-import bmlogic.dbData.{DBDataModule, msg_DBDataCommand}
+import bmlogic.sampleData.{SampleDataModule, msg_SampleDataCommand}
 import bmlogic.report.{ReportModule, msg_ReportCommand}
 import bmlogic.retrieval.{RetrievalModule, msg_RetrievalCommand}
 import bmlogic.userManage.{UserManageModule, msg_UserManageCommand}
@@ -63,7 +63,7 @@ class PipeFilterActor(originSender : ActorRef, msr : MessageRoutes) extends Acto
 		case cmd : msg_UserManageCommand => dispatchImpl(cmd, UserManageModule)
 		case cmd : msg_QueryUserCommand => dispatchImpl(cmd, QueryUserModule)
 		case cmd : msg_LoginLogCommand => dispatchImpl(cmd, LoginLogModule)
-		case cmd : msg_DBDataCommand => dispatchImpl(cmd,DBDataModule)
+		case cmd : msg_SampleDataCommand => dispatchImpl(cmd,SampleDataModule)
 		case cmd : ParallelMessage => {
 		    cancelActor
 			next = context.actorOf(ScatterGatherActor.prop(originSender, msr), "scat")
@@ -76,7 +76,7 @@ class PipeFilterActor(originSender : ActorRef, msr : MessageRoutes) extends Acto
 	 	case x : AnyRef => println(x); ???
 	}
 	
-	val timeOutSchdule = context.system.scheduler.scheduleOnce(2000 second, self, new timeout)
+	val timeOutSchdule = context.system.scheduler.scheduleOnce(20 minute, self, new timeout)
 
 	def rstReturn = tmp match {
 		case Some(_) => { rst match {

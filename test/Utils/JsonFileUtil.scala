@@ -30,7 +30,6 @@ object JsonFileUtil {
         val res=lsts.map {lst =>
             val t = lst._2.map { x =>
                 val condition = toJson(x)
-                //              println(toJson(token.+("condition" -> condition)))
                 toJson(Map("condition" -> condition))
             }
             (lst._1 , t)

@@ -67,16 +67,13 @@ trait UserData extends AuthScope{
     // for query
     implicit val d2m : DBObject => Map[String, JsValue] = { obj =>
         // 需要添加Scrope，的解析
-
         val sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss")
-
         Map(
             "user_id" -> toJson(obj.getAs[String]("user_id").map (x => x).getOrElse(throw new Exception("db prase error"))),
             "user_name" -> toJson(obj.getAs[String]("user_name").map (x => x).getOrElse(throw new Exception("db prase error"))),
             "pwd" -> toJson(obj.getAs[String]("pwd").map (x => x).getOrElse(throw new Exception("db prase error"))),
             "phoneNo" -> toJson(obj.getAs[String]("phoneNo").map (x => x).getOrElse(throw new Exception("db prase error"))),
             "email" -> toJson(obj.getAs[String]("email").map (x => x).getOrElse(throw new Exception("db prase error"))),
-
             "scope" -> toJson(Map("edge" -> queryEdgeScope(obj),
                 "category" -> queryProductLevelScope(obj),
                 "manufacture_name" -> queryManufactureNameScope(obj),

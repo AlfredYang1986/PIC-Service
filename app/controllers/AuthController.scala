@@ -8,26 +8,27 @@ import javax.inject._
 import akka.actor.ActorSystem
 import bminjection.db.DBTrait
 import bminjection.token.AuthTokenTrait
-import bmlogic.auth.AuthMessage.{msg_AuthPushUser, msg_AuthWithPassword, msg_CheckAuthTokenTest, msg_AuthTokenParser}
+import bmlogic.auth.AuthMessage._
 import bmlogic.common.requestArgsQuery
 import bmpattern.LogMessage.msg_log
 import bmpattern.ResultMessage.msg_CommonResultMessage
+import bmutil.logging.PharbersLog
 
-class AuthController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : AuthTokenTrait) extends Controller {
+class AuthController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : AuthTokenTrait, plog : PharbersLog) extends Controller {
     implicit val as = as_inject
 
     def authPushUser = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
             import bmpattern.LogMessage.common_log
             import bmpattern.ResultMessage.common_result
             MessageRoutes(msg_log(toJson(Map("method" -> toJson("push user"))), jv)
-                :: msg_AuthPushUser(jv) :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
+               :: msg_AuthPushUser(jv) :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att, "plog" -> plog))))
         })
 
     def authWithPassword = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
             import bmpattern.LogMessage.common_log
             import bmpattern.ResultMessage.common_result
 			MessageRoutes(msg_log(toJson(Map("method" -> toJson("auth with password"))), jv)
-                :: msg_AuthWithPassword(jv) :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
+                :: msg_AuthWithPassword(jv) :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att, "plog" -> plog))))
         })
 
     def authTokenCheckTest = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>

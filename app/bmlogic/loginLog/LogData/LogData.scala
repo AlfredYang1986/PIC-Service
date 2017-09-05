@@ -38,14 +38,14 @@ trait LogData {
     implicit val d2m : DBObject => Map[String, JsValue] = { obj =>
         val sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
         Map(
-            "user_name" -> toJson(obj.getAs[String]("user_name").map (x => x).getOrElse(throw new Exception("db prase error"))),
-            "log_id" -> toJson(obj.getAs[String]("log_id").map (x => x).getOrElse(throw new Exception("db prase error"))),
-            "date" -> toJson(obj.getAs[Number]("date").map (x => sdf.format(new Date(x.longValue()))).getOrElse(throw new Exception("db prase error"))),
+            "user_name" -> toJson(obj.getAs[String]("user_name").map (x => x).getOrElse(throw new Exception("log user_name db prase error"))),
+            "log_id" -> toJson(obj.getAs[String]("log_id").map (x => x).getOrElse(throw new Exception("log_id db prase error"))),
+            "date" -> toJson(obj.getAs[Number]("date").map (x => sdf.format(new Date(x.longValue()))).getOrElse(throw new Exception("log date db prase error"))),
 //            "login_end" -> toJson(obj.getAs[Number]("login_end").map (x => sdf.format(new Date(x.longValue()))).getOrElse(throw new E"login_start" -> toJson(obj.getAs[Number]("login_start").map (x => sdf.format(new Date(x.longValue()))).getOrElse(throw new Exception("db prase error"))),
 //            "date" -> toJson(obj.getAs[Long]("date").map (x => x).getOrElse(throw new Exception("db prase error"))),
-            "login_end" -> toJson(obj.getAs[Long]("login_end").map (x => sdf.format(new Date(x.longValue()))).getOrElse(throw new Exception("db prase error"))),
-            "time_sum" -> toJson(obj.getAs[Int]("time_sum").map (x => int2String(x)).getOrElse(throw new Exception("db prase error"))),
-            "ip" -> toJson(obj.getAs[String]("ip").map (x => x).getOrElse(throw new Exception("db prase error")))
+            "login_end" -> toJson(obj.getAs[Long]("login_end").map (x => sdf.format(new Date(x.longValue()))).getOrElse(throw new Exception("log login_end db prase error"))),
+            "time_sum" -> toJson(obj.getAs[Int]("time_sum").map (x => int2String(x)).getOrElse(throw new Exception("log time_sum db prase error"))),
+            "ip" -> toJson(obj.getAs[String]("ip").map (x => x).getOrElse(throw new Exception("log ip db prase error")))
         )
     }
 

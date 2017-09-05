@@ -120,7 +120,7 @@ class AMongoDBLINQ extends IDatabaseContext {
 		nc
 	}
 	
-	def selectSkipTop[U](skip : Int)(take : Int)(o : String)(cr : (MongoDBObject) => U) : IQueryable[U] = {
+	def  selectSkipTop[U](skip : Int)(take : Int)(o : String)(cr : (MongoDBObject) => U) : IQueryable[U] = {
 		val mongoColl = openConnection
 		val ct = mongoColl.find(w).sort(MongoDBObject(o -> -1)).skip(skip).limit(take)
 		var nc = new Linq_List[U]
