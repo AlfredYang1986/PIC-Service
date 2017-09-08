@@ -43,7 +43,7 @@ trait AuthData extends AuthScope {
         build += "user_id" -> (js \ "user_id").asOpt[String].map (x => x).getOrElse(throw new Exception("input error"))
         build += "pwd" -> (js \ "pwd").asOpt[String].map (x => x).getOrElse(throw new Exception("input error"))
         build += "screen_name" -> (js \ "screen_name").asOpt[String].map (x => x).getOrElse("")
-        build += "screen_photo" -> (js \ "screen_photo").asOpt[String].map (x => x).getOrElse("")
+        // build += "screen_photo" -> (js \ "screen_photo").asOpt[String].map (x => x).getOrElse("")
         build += "phoneNo" -> (js \ "phoneNo").asOpt[String].map (x => x).getOrElse("")
         build += "email" -> (js \ "email").asOpt[String].map (x => x).getOrElse("")
         
