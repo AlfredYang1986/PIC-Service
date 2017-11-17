@@ -55,6 +55,7 @@ object ConfigModule extends ModuleTrait with ConfigData{
         val user_scope = queryUserById(data)._1.get.get("scope").get
         val user_edge = user_scope.\("edge").get.asOpt[List[JsValue]].get
         val user_category = user_scope.\("category").get.asOpt[List[JsValue]].get
+        val user_sample = user_scope.\("sample").get.asOpt[Int].get
 //        val user_manufacture_name = user_scope.\("manufacture_name").get.asOpt[List[JsValue]].get
 //        val user_is_admin = user_scope.\("is_admin").get
 
@@ -75,7 +76,7 @@ object ConfigModule extends ModuleTrait with ConfigData{
         var s_atc_three = "{id:\"3\",text:\"治疗类别III[搜索框]\",checked:\"true\",items:"+list2string(atc_three)+"},"
         var s_province = "{id:\"4\",text:\"区域[搜索框]\",checked:\"true\",items:"+list2string(province)+"},"
 //        val s_sample =  "{id:\"5\",text:\"显示样本数据[搜索框]\",checked:\"true\",items:" + list2string(sample) +"}"
-        val s_sample = "{id:\"5\",text:\"显示样本报告\",checked:\"true\"}"
+        var s_sample = "{id:\"5\",text:\"显示样本报告\",checked:\"true\"}"
 
         val u_c_it = user_category.iterator
         val u_e_it = user_edge.iterator
@@ -93,12 +94,14 @@ object ConfigModule extends ModuleTrait with ConfigData{
             }
         }
         if (user_edge.length>0){
-            s_province = "{id:\"4\",text:\"区域[搜索框]\",items:"+list2string(province)+"}"
+            s_province = "{id:\"4\",text:\"区域[搜索框]\",items:"+list2string(province)+"},"
             while (u_e_it.hasNext){
                 temp = u_e_it.next().toString()
                 s_province=s_province.replaceFirst(temp,temp+",checked:\"true\"")
             }
         }
+
+        if (user_sample==0) s_sample = "{id:\"5\",text:\"显示样本报告\"}"
     
         val s_result = "["+s_atc_one+s_atc_two+s_atc_three+s_province+s_sample+"]"
     
