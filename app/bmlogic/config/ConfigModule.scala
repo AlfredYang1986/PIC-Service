@@ -126,8 +126,6 @@ object ConfigModule extends ModuleTrait with ConfigData{
 //                s_province=s_province.replaceFirst(temp,temp+",checked:\"true\"")
 //            }
         }
-        if(user_sample==0)
-            s_sample="{id:\"5\",text:\"显示样本报告\"}"
     
         val s_result = "["+s_atc_one+s_atc_two+s_atc_three+s_province+s_sample+"]"
     

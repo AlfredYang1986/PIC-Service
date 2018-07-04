@@ -8,6 +8,7 @@ import play.api.mvc._
 import play.api.libs.json._
 import play.api.test._
 import Utils._
+import bmmessages.CommonModules
 
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
@@ -100,40 +101,41 @@ class PICTestSpec extends Specification with BeforeAll{
                                                                               """
     
     override def beforeAll(): Unit = {
-        if (dbChanged){
-            val listC2 = List(
-                ("test3_15",ConditionUtil.one_condition_with_time("atc_one",dateYear)),
-                ("test3_16",ConditionUtil.one_condition_with_time("atc_one",dateMonth)),
-                ("test3_17",ConditionUtil.one_condition_with_time("atc_two",dateYear)),
-                ("test3_18",ConditionUtil.one_condition_with_time("atc_two",dateMonth)),
-                ("test3_19",ConditionUtil.one_condition_with_time("atc_three",dateYear)),
-                ("test3_20",ConditionUtil.one_condition_with_time("atc_three",dateMonth))
-            )
-            val listC3 = List(
-                ("test3_21",ConditionUtil.two_condition_with_time("atc_three","oral_name",dateYear)),
-                ("test3_22",ConditionUtil.two_condition_with_time("atc_three","oral_name",dateMonth)),
-                ("test3_23",ConditionUtil.two_condition_with_time("atc_three","product_name",dateYear)),
-                ("test3_24",ConditionUtil.two_condition_with_time("atc_three","product_name",dateMonth))
-            )
-            val listC4_testCase3_25 = List(
-                ("test3_25",ConditionUtil.three_condition_with_year("atc_three","product_name","province",dateYear))
-            )
-            val listC4_testCase3_26 = List(
-                ("test3_26",ConditionUtil.three_condition_with_month("atc_three","product_name","province",dateMonth))
-            )
-            val listC5_testCase3_27 = List(
-                ("test3_27",ConditionUtil.four_condition_with_year("atc_three","product_name","province","manufacture",dateYear))
-            )
-            val listC5_testCase3_28 = List(
-                ("test3_28",ConditionUtil.four_condition_with_month("atc_three","product_name","province","manufacture",dateMonth))
-            )
-            JsonFileUtil.writeJson(listC2,"c2",false)
-            JsonFileUtil.writeJson(listC3,"c3",false)
-            JsonFileUtil.writeJson(listC4_testCase3_25,"c4_testCase3_25",false)
-            JsonFileUtil.writeJson(listC4_testCase3_26,"c4_testCase3_26",false)
-            JsonFileUtil.writeJson(listC5_testCase3_27,"c5_testCase3_27",false)
-            JsonFileUtil.writeJson(listC5_testCase3_28,"c5_testCase3_28",false)
-        }
+//        if (dbChanged){
+//            val listC2 = List(
+//                ("test3_15",ConditionUtil.one_condition_with_time("atc_one",dateYear)),
+//                ("test3_16",ConditionUtil.one_condition_with_time("atc_one",dateMonth)),
+//                ("test3_17",ConditionUtil.one_condition_with_time("atc_two",dateYear)),
+//                ("test3_18",ConditionUtil.one_condition_with_time("atc_two",dateMonth)),
+//                ("test3_19",ConditionUtil.one_condition_with_time("atc_three",dateYear)),
+//                ("test3_20",ConditionUtil.one_condition_with_time("atc_three",dateMonth))
+//            )
+//            val listC3 = List(
+//                ("test3_21",ConditionUtil.two_condition_with_time("atc_three","oral_name",dateYear)),
+//                ("test3_22",ConditionUtil.two_condition_with_time("atc_three","oral_name",dateMonth)),
+//                ("test3_23",ConditionUtil.two_condition_with_time("atc_three","product_name",dateYear)),
+//                ("test3_24",ConditionUtil.two_condition_with_time("atc_three","product_name",dateMonth))
+//            )
+//            val listC4_testCase3_25 = List(
+//                ("test3_25",ConditionUtil.three_condition_with_year("atc_three","product_name","province",dateYear))
+//            )
+//            val listC4_testCase3_26 = List(
+//                ("test3_26",ConditionUtil.three_condition_with_month("atc_three","product_name","province",dateMonth))
+//            )
+//            val listC5_testCase3_27 = List(
+//                ("test3_27",ConditionUtil.four_condition_with_year("atc_three","product_name","province","manufacture",dateYear))
+//            )
+//            val listC5_testCase3_28 = List(
+//                ("test3_28",ConditionUtil.four_condition_with_month("atc_three","product_name","province","manufacture",dateMonth))
+//            )
+//            JsonFileUtil.writeJson(listC2,"c2",false)
+//            JsonFileUtil.writeJson(listC3,"c3",false)
+//            JsonFileUtil.writeJson(listC4_testCase3_25,"c4_testCase3_25",false)
+//            JsonFileUtil.writeJson(listC4_testCase3_26,"c4_testCase3_26",false)
+//            JsonFileUtil.writeJson(listC5_testCase3_27,"c5_testCase3_27",false)
+//            JsonFileUtil.writeJson(listC5_testCase3_28,"c5_testCase3_28",false)
+//        }
+        println("beforeAll !")
     }
     
     def authToken =

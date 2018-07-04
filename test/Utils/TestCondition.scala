@@ -1,6 +1,7 @@
 package Utils
 
 
+import bmmessages.CommonModules
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json.toJson
 
@@ -21,7 +22,7 @@ object TestCondition {
       * @param gap
       * @return
       */
-    def condition(condition:List[String],endYear:Int=2016,endMonth:Int=12,timeType:String="year",gap:Int=1): List[Map[String,JsValue]] ={
+    def condition(condition:List[String],endYear:Int=2016,endMonth:Int=12,timeType:String="year",gap:Int=1)(implicit cm : CommonModules): List[Map[String,JsValue]] ={
         val time=TimeUtil.timeArrInstance(endYear,endMonth,timeType,gap)
         var c:List[Map[String,JsValue]]=List(Map(""->toJson("")))
         val conditionNum=condition.size

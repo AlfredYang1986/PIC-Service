@@ -12,7 +12,7 @@ import scala.util.Random
   */
 object ConditionUtil {
     //改错 atc_two
-    def chooseCondition(condition_name:String): Map[String,List[String]]={
+    def chooseCondition(condition_name:String)(implicit cm : CommonModules): Map[String,List[String]]={
         val tmp=toJson(Map(""->""))
         val category=CategoryModule.Category(tmp)._1.get
 //        category.foreach(x=>println(x))
@@ -91,11 +91,11 @@ object ConditionUtil {
       * @param date
       * @return
       */
-    def one_condition_with_time(condition:String,date : List[(String,JsValue)]): List[Map[String,JsValue]] ={
+    def one_condition_with_time(condition:String,date : List[(String,JsValue)])(implicit cm : CommonModules): List[Map[String,JsValue]] ={
         val res=chooseCondition(condition)::Nil
         getConditions(res,date)
     }
-    def two_condition_with_time(condition_one:String,condition_two:String,date : List[(String,JsValue)]): List[Map[String,JsValue]] ={
+    def two_condition_with_time(condition_one:String,condition_two:String,date : List[(String,JsValue)])(implicit cm : CommonModules): List[Map[String,JsValue]] ={
         val res=chooseCondition(condition_one)::chooseCondition(condition_two)::Nil
         getConditions(res,date)
     }
@@ -106,7 +106,7 @@ object ConditionUtil {
       * @define four_condition_with_year 控制conditions返回条数为1000+
       * @define four_condition_with_month 控制conditions返回条数为1000+
       */
-    def three_condition_with_year(condition_one:String,condition_two:String,condition_three:String,date : List[(String,JsValue)]): List[Map[String,JsValue]] ={
+    def three_condition_with_year(condition_one:String,condition_two:String,condition_three:String,date : List[(String,JsValue)])(implicit cm : CommonModules): List[Map[String,JsValue]] ={
         val res=chooseCondition(condition_one)::chooseCondition(condition_two)::chooseCondition(condition_three)::Nil
         val result = getConditions(res,date)
         val length : Int = result.length
@@ -120,7 +120,7 @@ object ConditionUtil {
         println(s"&&&&final_result.length&&&&=>${final_result.length}")
         final_result
     }
-    def three_condition_with_month(condition_one:String,condition_two:String,condition_three:String,date : List[(String,JsValue)]): List[Map[String,JsValue]] ={
+    def three_condition_with_month(condition_one:String,condition_two:String,condition_three:String,date : List[(String,JsValue)])(implicit cm : CommonModules): List[Map[String,JsValue]] ={
         val res=chooseCondition(condition_one)::chooseCondition(condition_two)::chooseCondition(condition_three)::Nil
         val result = getConditions(res,date)
         val length : Int = result.length
@@ -136,7 +136,7 @@ object ConditionUtil {
         println(s"&&&&final_result.length&&&&=>${final_result.length}")
         final_result
     }
-    def four_condition_with_year(condition_one:String,condition_two:String,condition_three:String,condition_four:String,date : List[(String,JsValue)]): List[Map[String,JsValue]] ={
+    def four_condition_with_year(condition_one:String,condition_two:String,condition_three:String,condition_four:String,date : List[(String,JsValue)])(implicit cm : CommonModules): List[Map[String,JsValue]] ={
         val res=chooseCondition(condition_one)::chooseCondition(condition_two)::chooseCondition(condition_three)::chooseCondition(condition_four)::Nil
         val result = getConditions(res,date)
         val length : Int = result.length
@@ -152,7 +152,7 @@ object ConditionUtil {
         println(s"&&&&final_result.length&&&&=>${final_result.length}")
         final_result
     }
-    def four_condition_with_month(condition_one:String,condition_two:String,condition_three:String,condition_four:String,date : List[(String,JsValue)]): List[Map[String,JsValue]] ={
+    def four_condition_with_month(condition_one:String,condition_two:String,condition_three:String,condition_four:String,date : List[(String,JsValue)])(implicit cm : CommonModules): List[Map[String,JsValue]] ={
 
         val lists=chooseCondition(condition_one)::chooseCondition(condition_two)::chooseCondition(condition_three)::chooseCondition(condition_four)::Nil
 

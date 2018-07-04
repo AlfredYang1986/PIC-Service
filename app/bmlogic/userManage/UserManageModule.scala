@@ -82,7 +82,8 @@ object UserManageModule extends ModuleTrait with AuthData {
 
             val category_list = scope.groupBy(x => x.charAt(0)).getOrElse('c',new MongoDBList)
             val edge_list = scope.groupBy(x => x.charAt(0)).getOrElse('e',new MongoDBList)
-            val sampleVal= scope.filter(x => x.charAt(0) == 's').head.split("-")(1).toInt
+//            val sampleVal= scope.filter(x => x.charAt(0) == 's').head.split("-")(1).toInt
+            val sampleVal= scope.filter(x => x.charAt(0) == 's').last.split("-")(1).toInt
             val scope_builder = MongoDBObject.newBuilder
             if (category_list.length==0){
                 scope_builder += "category" -> new MongoDBList
