@@ -5,8 +5,9 @@ import bmlogic.aggregateCalc.AggregateCalcMessage._
 import bmlogic.conditions.ConditionSearchFunc
 import bmmessages.{CommonModules, MessageDefines}
 import bmpattern.ModuleTrait
+import bmutil.MergeJs
 import bmutil.errorcode.ErrorCode
-import play.api.libs.json.JsValue
+import play.api.libs.json.{JsObject, JsValue}
 import play.api.libs.json.Json.toJson
 import com.mongodb.casbah.Imports._
 
@@ -33,19 +34,15 @@ object AggregateModule extends ModuleTrait with ConditionSearchFunc {
                        (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
         
         try {
+            val mergeJs=MergeJs.dataMergeWithPr(data,pr)
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
             
             val condition = (conditionParse(data, pr.get) :: dateConditionParse(data) :: oralNameConditionParse(data) :: productNameConditionParse(data) :: Nil).filterNot(_ == None).map(_.get)
-            //                                oralNameConditionParse(data) :: productNameConditionParse(data) :: Nil).
-            //                                    filterNot(_ == None).map(_.get)
-//            println("1、市场规模条件" + condition)
-            if (pr.get.filterKeys(x => x=="Warning").isEmpty){
+            if (mergeJs.as[JsObject].value.filterKeys(x => x=="Warning").isEmpty){
                 val group = MongoDBObject("_id" -> MongoDBObject("ms" -> "market size"), "sales" -> MongoDBObject("$sum" -> "$sales"))
-//                println("1、市场规模group:" + group)
                 val result = db.aggregate($and(condition), "retrieval", group){ x =>
                     Map("sales" -> toJson(aggregateSalesResult(x, "market size")))
                 }
-//                println("1.市场规模"+result)
                 if (result.isEmpty) throw new Exception("calc market size func error")
                 else (Some(Map("calc" -> toJson(result))), None)
             }else {
@@ -63,8 +60,9 @@ object AggregateModule extends ModuleTrait with ConditionSearchFunc {
                  (pr : Option[Map[String, JsValue]])
                  (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
         try {
+            val mergeJs=MergeJs.dataMergeWithPr(data,pr)
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
-            if (pr.get.filterKeys(x => x=="Warning").isEmpty){
+            if (mergeJs.as[JsObject].value.filterKeys(x => x=="Warning").isEmpty){
                 val condition = (conditionParse(data, pr.get) :: dateConditionParse(data) ::
                     oralNameConditionParse(data) :: productNameConditionParse(data) :: Nil).
                     filterNot(_ == None).map(_.get)
@@ -75,9 +73,6 @@ object AggregateModule extends ModuleTrait with ConditionSearchFunc {
                 val result = db.aggregate($and(condition), "retrieval", group){ x =>
                     Map("sales" -> toJson(aggregateSalesResult(x, "market trend")))
                 }
-//                println("2.市场增长率"+group)
-//                println("2.市场增长率" + condition)
-//                println("2.市场增长率"+result)
                 
                 if (result.isEmpty) throw new Exception("calc market trend func error")
                 else (Some(Map("trend" -> toJson(result))), None)
@@ -95,9 +90,10 @@ object AggregateModule extends ModuleTrait with ConditionSearchFunc {
                       (pr : Option[Map[String, JsValue]])
                       (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
         try {
+            val mergeJs=MergeJs.dataMergeWithPr(data,pr)
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
-
-            if (pr.get.filterKeys(x => x=="Warning").isEmpty){
+            
+            if (mergeJs.as[JsObject].value.filterKeys(x => x=="Warning").isEmpty){
                 val oral_name_condition = oralNameConditionParse(data)
                 val product_name_condition = productNameConditionParse(data)
 
@@ -126,8 +122,6 @@ object AggregateModule extends ModuleTrait with ConditionSearchFunc {
                     if (ori_result.isEmpty || par_result.isEmpty) throw new Exception("")
                     else (ori_result.get.get("sales").get.asOpt[Long].get.floatValue()) /
                         (par_result.get.get("sales").get.asOpt[Long].get.floatValue())
-//                println("3.份额:"+ group)
-//                println("3.份额:"+percentage)
                 (Some(Map(
                     "percentage" -> toJson(percentage)
                 )), None)
@@ -160,20 +154,17 @@ object AggregateModule extends ModuleTrait with ConditionSearchFunc {
         }
         
         try {
+            val mergeJs=MergeJs.dataMergeWithPr(data,pr)
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
             
-            if (pr.get.filterKeys(x => x=="Warning").isEmpty){
+            if (mergeJs.as[JsObject].value.filterKeys(x => x=="Warning").isEmpty){
                 val group = MongoDBObject("_id" -> MongoDBObject("product_name" -> "$product_name", "manufacture" -> "$manufacture", "product_type" -> "$product_type"))
                 val condition = (conditionParse(data, pr.get) :: dateConditionParse(data) :: oralNameConditionParse(data) :: productNameConditionParse(data) :: Nil).filterNot(_ == None).map(_.get)
-//                val condition = (conditionParse(data, pr.get) :: oralNameConditionParse(data) :: productNameConditionParse(data) :: Nil).filterNot(_ == None).map(_.get)
-//                println("4、产品数量条件" + condition)
-//                println("4、group:" + group)
-                
                 val size = db.aggregate($and(condition), "retrieval", group) { x =>
                     Map("size" -> toJson(aggregateResult(x)))
                 }
-//                println("4、:" + size)
-                (size, None)
+                if(size.isEmpty) throw new Exception("product size  func error")
+                else (size, None)
             }else{
                 (Some(Map("size" -> toJson(0))), None)
             }
@@ -189,9 +180,10 @@ object AggregateModule extends ModuleTrait with ConditionSearchFunc {
                     (pr : Option[Map[String, JsValue]])
                     (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
         try {
+            val mergeJs=MergeJs.dataMergeWithPr(data,pr)
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
 
-            if (pr.get.filterKeys(x => x=="Warning").isEmpty){
+            if (mergeJs.as[JsObject].value.filterKeys(x => x=="Warning").isEmpty){
                 val condition = (conditionParse(data, pr.get) :: dateConditionParse(data, true) ::
                     oralNameConditionParse(data) :: productNameConditionParse(data) :: Nil).
                     filterNot(_ == None).map(_.get)

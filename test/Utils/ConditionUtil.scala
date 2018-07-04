@@ -1,9 +1,8 @@
 package Utils
 
-import bminjection.db.LoadConfig._
 import play.api.libs.json.Json.toJson
 import bmlogic.category.CategoryModule
-import bmmessages.CommonModules
+import bmlogic.config.ConfigModule
 import play.api.libs.json.JsValue
 
 import scala.collection.immutable.Map
@@ -17,7 +16,7 @@ object ConditionUtil {
         val tmp=toJson(Map(""->""))
         val category=CategoryModule.Category(tmp)._1.get
 //        category.foreach(x=>println(x))
-        lazy val configs=config.get
+        val configs=ConfigModule.LoadConfig.get
         val configMap=configs.reduce{(a,b) => a.+(b.keys.head -> b.get(b.keys.head).get) }
 //        configMap.foreach(x=>println(x))
         var value : Map[String,List[String]] = null

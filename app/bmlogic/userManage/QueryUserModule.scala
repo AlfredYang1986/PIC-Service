@@ -27,9 +27,11 @@ object QueryUserModule extends ModuleTrait with UserData {
     def query_user_func(data: JsValue)(implicit cm : CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = {
         try {
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
-            val userList=db.queryMultipleObject(DBObject(),"users").map(x=>x)
+//            val userList=db.queryMultipleObject(DBObject(""->""),"users").map(x=>x)
+            val userList=db.loadAllData("users").map(x => x)
             if (userList.isEmpty) throw new Exception("unknown error")
             else {
+                
                 val record=userList.length
                 val pages=record/10+1
                 (Some(Map(
@@ -43,7 +45,8 @@ object QueryUserModule extends ModuleTrait with UserData {
             }
 
         } catch {
-            case ex: Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
+            case ex: Exception =>
+                (None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
     }
 

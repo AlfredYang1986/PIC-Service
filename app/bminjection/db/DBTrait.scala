@@ -6,6 +6,9 @@ import play.api.libs.json.JsValue
 /**
   * Created by alfredyang on 01/06/2017.
   */
+
+
+
 trait DBTrait {
     def insertObject(obj : DBObject, db_name : String, primary_key : String) : Unit
     def updateObject(obj : DBObject, db_name : String, primary_key : String) : Unit
@@ -16,7 +19,8 @@ trait DBTrait {
                            (implicit t : DBObject => Map[String, JsValue]) : List[Map[String, JsValue]]
     def queryAllObject(db_name:String,skip : Int = 0, take : Int = 20)
                       (implicit t:DBObject => Map[String,JsValue]):List[Map[String,JsValue]]
-
+    def loadAllData(db_name:String)
+                   (implicit t:DBObject => Map[String,JsValue]):List[Map[String,JsValue]]
     def querySum(condition : DBObject, db_name : String)
                 (sum : (Map[String, JsValue], Map[String, JsValue]) => Map[String, JsValue])
                 (acc: (DBObject) => Map[String, JsValue]) : Option[Map[String, JsValue]]

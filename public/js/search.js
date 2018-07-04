@@ -80,7 +80,25 @@ var pageResult = function(skip) {
             $("#tbody").empty();
             $("#pageview").show()
             $.each(r.search_result, function(i, v){
-                $("#tbody").append(v.html)
+                $("#tbody").append("<tr>" +
+                        "<th>" +v.index+ "</th>"+
+                        "<th>" +v.date+ "</th>"+
+                        "<th>" +v.province+ "</th>"+
+                        "<th>" +v.product_name+ "</th>"+
+                        "<th>" +v.sales+ "</th>"+
+                        "<th>" +v.units+ "</th>"+
+                        "<th>" +v.oral_name+ "</th>"+
+                        "<th>" +v.manufacture+ "</th>"+
+                        "<th>" +v.specifications+ "</th>"+
+                        "<th>" +v.act1+ "</th>"+
+                        "<th>" +v.act2+ "</th>"+
+                        "<th>" +v.act3+ "</th>"+
+                        "<th>" +v.product_unit+ "</th>"+
+                        "<th>" +v.manufacture_type+ "</th>"+
+                        "<th>" +v.product_type+ "</th>"+
+                        "<th>" +v.package+ "</th>"+
+                    "</tr>")
+                // $("#tbody").append(v.html)
             })
             Page(r)
             if(searchCount == 5){
@@ -127,7 +145,7 @@ var getTime = function() {
  * ************************************************************************
  * 显示主页的四个小汇总
  */
-var showDataGather = function() {
+var showDataGather = function(){
     c = $.extend(getSearchValue(), getTime())
     var data = JSON.stringify({
         "token": $.cookie("token"),
@@ -150,8 +168,6 @@ var showDataGather = function() {
         calcPercentage(data);
         productSize(data);
     }
-
-
 
 }
 

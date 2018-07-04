@@ -202,6 +202,22 @@ ul,li{margin:0;padding:0}
     height: 150px;
     overflow-y: auto;
 }
+.manufactTh{
+    min-width: 190px;
+}
+.pacTh{
+    overflow:hidden;
+    white-space:nowrap;
+    min-width:100px;
+}
+.productTh{
+    min-width: 50px;
+}
+.oralTh{
+    min-width: 50px;
+}
+
+
 :-moz-placeholder { /* Mozilla Firefox 4 to 18 */
     color: #edf6ff;
     opacity:1;

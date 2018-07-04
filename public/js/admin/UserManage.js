@@ -118,9 +118,9 @@ $("#grid").kendoGrid({
 	},
 	columns: [{
         field: "user_id",
-        title: "批量操作",
+        title: "#",
         template: "<div style=\"text-align:center\"><input type='checkbox' id='batch' value='#: id #' /></div>",
-        width: 75
+        width: '5%'
     }/*,{
          field: "rowNumber",
          title: "序号",
@@ -129,7 +129,7 @@ $("#grid").kendoGrid({
      }*/, {
          field: "user_name",
          title: "用户名",
-         width: 120
+         width: '15%'
      }, {
          field: "pwd",
          title: "密码",
@@ -138,20 +138,21 @@ $("#grid").kendoGrid({
         field: "status",
         title: "用户状态",
         values : [{"value": 1, "text": "正常开通" },{"value": 0,"text": "暂不开通"}],
-        width: 75
+        width: '10%'
     }, {
          field: "date",
          title: "创建时间",
          format: "{0: yyyy-MM-dd HH:mm:ss}", //格式化时间  
-         width: 180
+         width: '20%'
      }, {
          field: "updateDate",
          title: "修改时间",
          format: "{0: yyyy-MM-dd HH:mm:ss}", //格式化时间
-         width: 180
+         width: '20%'
      },{
  	     command : [/*{ text: "View Details", click: showDetails }, */{ name: "edit", text: { edit: "编辑", cancel: "取消", update: "更新" } }, { name: "destroy",text: "删除" }, {  template: kendo.template($("#templateRole").html())}], 
-         title : "操作"
+         title : "操作",
+		 width: '30%'
      }],
     editable: {
     	mode: "popup",
@@ -312,26 +313,26 @@ function saveUserAuth(userId){
 
 function checkedNodeIds(nodes, checkedNodes) {
     for (var i = 0; i < nodes.length; i++) {
-    	if (nodes[i].checked && nodes[i].hasChildren == false && nodes[i].text!="显示样本报告") {
-    		if(nodes[i].id < 30){
-    			 checkedNodes.push("c-"+nodes[i].text);
-    		}else{
-    			 checkedNodes.push("e-"+nodes[i].text);
-    		}
+        if (nodes[i].checked && nodes[i].hasChildren == false && nodes[i].text!="显示样本报告") {
+            if(nodes[i].id < 30){
+                checkedNodes.push("c-"+nodes[i].text);
+            }else{
+                checkedNodes.push("e-"+nodes[i].text);
+            }
         }
         if (nodes[i].hasChildren) {
-        	 checkedNodeIds(nodes[i].children.view(), checkedNodes);
+            checkedNodeIds(nodes[i].children.view(), checkedNodes);
         }
     }
     var beforeLen=nodes.length -1;
-	if(nodes[beforeLen].text=="显示样本报告"){
+    if(nodes[beforeLen].text=="显示样本报告"){
         if(nodes[beforeLen].checked){
             checkedNodes.push("s-" + "1");
         }else {
             checkedNodes.push("s-" + "0");
         }
-	}
-	return checkedNodes;
+    }
+    return checkedNodes;
 }
 
 function cancelUserAuth(){

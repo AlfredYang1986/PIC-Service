@@ -28,32 +28,32 @@ trait AuthScope {
     }
 
     def queryEdgeScope(obj : MongoDBObject) : JsValue = {
-        val scope = obj.getAs[MongoDBObject]("scope").map (x => x).getOrElse(throw new Exception("db prase error"))
-        val lst = scope.getAs[List[String]]("edge").map (x => x).getOrElse(throw new Exception("db prase error"))
+        val scope = obj.getAs[MongoDBObject]("scope").map (x => x).getOrElse(throw new Exception("scope db prase error"))
+        val lst = scope.getAs[List[String]]("edge").map (x => x).getOrElse(throw new Exception("edge db prase error"))
         toJson(lst)
     }
 
     def queryProductLevelScope(obj : MongoDBObject) : JsValue = {
-        val scope = obj.getAs[MongoDBObject]("scope").map (x => x).getOrElse(throw new Exception("db prase error"))
-        val lst = scope.getAs[List[String]]("category").map (x => x).getOrElse(throw new Exception("db prase error"))
+        val scope = obj.getAs[MongoDBObject]("scope").map (x => x).getOrElse(throw new Exception("scope db prase error"))
+        val lst = scope.getAs[List[String]]("category").map (x => x).getOrElse(throw new Exception("category db prase error"))
         toJson(lst)
     }
 
     def queryManufactureNameScope(obj : MongoDBObject) : JsValue = {
-        val scope = obj.getAs[MongoDBObject]("scope").map (x => x).getOrElse(throw new Exception("db prase error"))
-        val lst = scope.getAs[List[String]]("manufacture_name").map (x => x).getOrElse(throw new Exception("db prase error"))
+        val scope = obj.getAs[MongoDBObject]("scope").map (x => x).getOrElse(throw new Exception("scope db prase error"))
+        val lst = scope.getAs[List[String]]("manufacture_name").map (x => x).getOrElse(throw new Exception("manufacture_name db prase error"))
         toJson(lst)
     }
 
     def queryIsAdminScope(obj : MongoDBObject) : JsValue = {
-        val scope = obj.getAs[MongoDBObject]("scope").map (x => x).getOrElse(throw new Exception("db prase error"))
-        val is_admin = scope.getAs[Number]("is_admin").map (x => x).getOrElse(throw new Exception("db prase error"))
+        val scope = obj.getAs[MongoDBObject]("scope").map (x => x).getOrElse(throw new Exception("scope db prase error"))
+        val is_admin = scope.getAs[Number]("is_admin").map (x => x).getOrElse(throw new Exception("is_admin db prase error"))
         toJson(is_admin.intValue)
     }
     
     def querySampleScope(obj:MongoDBObject) : JsValue={
-        val scope = obj.getAs[MongoDBObject]("scope").map(x => x).getOrElse(throw new Exception("db scope prase error"))
-        val sample=scope.getAs[Int]("sample").map(x => x).getOrElse(throw  new Exception("db sample prase error"))
+        val scope = obj.getAs[MongoDBObject]("scope").map(x => x).getOrElse(throw new Exception("scope db  prase error"))
+        val sample=scope.getAs[Int]("sample").map(x => x).getOrElse(throw  new Exception("sample db prase error"))
         toJson(sample)
     }
 

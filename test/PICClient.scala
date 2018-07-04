@@ -13,7 +13,7 @@ import scala.concurrent.{ExecutionContext, Future}
   */
 class PICClient(ws: WSClient, baseUrl: String)(implicit ec: ExecutionContext) {
     @Inject def this(ws: WSClient, ec: ExecutionContext) = this(ws, "http://127.0.0.1:8888")(ec)
-
+    
     def authWithPasswordTest(name : String, pwd : String) : Future[String] = {
         ws.url(baseUrl + "/auth/password")
             .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
@@ -22,7 +22,7 @@ class PICClient(ws: WSClient, baseUrl: String)(implicit ec: ExecutionContext) {
                 (response.json \ "result").get.asOpt[Map[String,JsValue]].get.get("auth_token").get.asOpt[String].get
             }
     }
-
+    
     def getCateTest() : Future[Map[String,JsValue]] = {
         ws.url(baseUrl + "/category")
             .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
@@ -31,9 +31,9 @@ class PICClient(ws: WSClient, baseUrl: String)(implicit ec: ExecutionContext) {
                 (response.json \ "result").get.asOpt[Map[String,JsValue]].get
             }
     }
-
+    
     def conditionSearchResult(token : String, conditions : List[Map[String, JsValue]], skip : Int, contains : String) : List[Future[String]] = {
-
+        
         val resultList = conditions.map { condition =>
             val test = ws.url(baseUrl + "/data/search")
                 .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
@@ -66,9 +66,9 @@ class PICClient(ws: WSClient, baseUrl: String)(implicit ec: ExecutionContext) {
             test
         }
         resultList
-
+        
     }
-
+    
     def oneCondition(token : String, condition : Map[String, JsValue],url:String):Future[String]={
         ws.url(baseUrl+url)
             .withHeaders("Accept" -> "application/json","Content-Type" -> "application/json")
@@ -76,7 +76,7 @@ class PICClient(ws: WSClient, baseUrl: String)(implicit ec: ExecutionContext) {
             //        .map(response=>(response.json \ "status").asOpt[String].get)
             .map(response=>testUtil.resultHandling(response,condition))
     }
-
+    
     def getToken(name : String, pwd : String) : Future[(String,JsValue)] = {
         ws.url(baseUrl + "/auth/password")
             .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")

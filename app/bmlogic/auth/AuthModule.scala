@@ -12,7 +12,9 @@ import bmlogic.common.sercurity.Sercurity
 import bmmessages.MessageDefines
 import bmmessages.CommonModules
 import bmpattern.ModuleTrait
+import bmutil.MergeJs
 import bmutil.errorcode.ErrorCode
+import bmutil.logging.PharbersLog
 
 import scala.collection.immutable.Map
 import com.mongodb.casbah.Imports._
@@ -23,6 +25,7 @@ object AuthModule extends ModuleTrait with AuthData {
         case msg_AuthPushUser(data) => authPushUser(data)
 		case msg_AuthWithPassword(data) => authWithPassword(data)
         case msg_AuthTokenParser(data) => authTokenPraser(data)
+        case msg_getAuthUserName(data) => getAuthUserName(data)
         
         case msg_CheckAuthTokenTest(data) => checkAuthTokenTest(data)(pr)
         case msg_CheckTokenExpire(data) => checkAuthTokenExpire(data)(pr)
@@ -52,11 +55,12 @@ object AuthModule extends ModuleTrait with AuthData {
             o += "date" -> date.asInstanceOf[Number]
             o += "updateDate" -> date.asInstanceOf[Number]
             
+            val user=(data \ "user").get.as[String]
             db.insertObject(o, "users", "user_name")
             val result = toJson(o - "pwd" - "phoneNo" - "email" - "date" - "createDate" - "updateDate" - "status" + ("expire_in" -> toJson(date + 60 * 60 * 1000 * 24))) // token 默认一天过期
             val auth_token = att.encrypt2Token(toJson(result))
             val reVal = toJson(o - "user_id" - "pwd" - "phoneNo" - "email" - "date" - "createDate" - "updateDate" - "status" - "scope")
-
+            
             (Some(Map(
                 "auth_token" -> toJson(auth_token),
                 "user" -> reVal
@@ -70,13 +74,15 @@ object AuthModule extends ModuleTrait with AuthData {
     def authWithPassword(data : JsValue)(implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
 		try {
 			val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+            val plog=cm.modules.get.get("plog").map(x => x.asInstanceOf[PharbersLog]).getOrElse(throw new Exception("can't get log"))
 			val user_name = (data \ "user_name").asOpt[String].map (x => x).getOrElse(throw new Exception("input error"))
 			val pwd = (data \ "pwd").asOpt[String].map (x => x).getOrElse(throw new Exception("input error"))
 			val result = db.queryObject($and("user_name" -> user_name, "pwd" -> pwd), "users")
             val date = new Date().getTime
             if (result.isEmpty) throw new Exception("unkonw error")
 			else {
-                
+                plog.out2file("user login pic", user_name)
+                plog.out2console("aaa,","YangMei")
                 val att = cm.modules.get.get("att").map (x => x.asInstanceOf[AuthTokenTrait]).getOrElse(throw new Exception("no encrypt impl"))
                 val reVal = result.get + ("expire_in" -> toJson(date + 60 * 60 * 1000 * 24 * 10))//临时改为10天的token期限
                 val auth_token = att.encrypt2Token(toJson(reVal))
@@ -121,7 +127,6 @@ object AuthModule extends ModuleTrait with AuthData {
     def authTokenPraser(data : JsValue)(implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
         try {
             val att = cm.modules.get.get("att").map (x => x.asInstanceOf[AuthTokenTrait]).getOrElse(throw new Exception("no encrypt impl"))
-
             val auth_token = (data \ "token").asOpt[String].map (x => x).getOrElse(throw new Exception("input error"))
             val auth = att.decrypt2JsValue(auth_token)
             (Some(Map("auth" -> auth)), None)
@@ -130,11 +135,22 @@ object AuthModule extends ModuleTrait with AuthData {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
     }
+    def getAuthUserName(data : JsValue)(implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+        try {
+            val att = cm.modules.get.get("att").map (x => x.asInstanceOf[AuthTokenTrait]).getOrElse(throw new Exception("no encrypt impl"))
+            val auth_token = (data \ "token").asOpt[String].map (x => x).getOrElse(throw new Exception("input error"))
+            val auth = att.decrypt2JsValue(auth_token)
+            val userName=(auth \ "user_name").get
+            (Some(Map("user" -> userName)), None)
+            
+        } catch {
+            case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
 
     def checkAuthTokenTest(data : JsValue)
                           (pr : Option[Map[String, JsValue]])
                           (implicit cm : CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = {
-//        println(pr)
         (pr, None)
     }
 
@@ -143,10 +159,10 @@ object AuthModule extends ModuleTrait with AuthData {
                       (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
 
         try {
-            val auth = pr.map (x => x.get("auth").get).getOrElse(throw new Exception("token parse error"))
-            val edge_lst = (auth \ "scope" \ "edge").asOpt[List[String]].map (x => x.distinct.sorted).getOrElse(throw new Exception("token parse error"))
+            val mergeJs=MergeJs.dataMergeWithPr(data,pr)
+            val edge_lst = (mergeJs\"auth" \ "scope" \ "edge").asOpt[List[String]].map (x => x.distinct.sorted).getOrElse(throw new Exception("token parse error"))
 
-            (data \ "condition" \ "edge").asOpt[List[String]].map { x =>
+            (mergeJs \ "condition" \ "edge").asOpt[List[String]].map { x =>
 
                 val edge_condition = x.distinct.sorted
                 var result = pr.get
@@ -180,13 +196,13 @@ object AuthModule extends ModuleTrait with AuthData {
                               (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
 
         try {
-            val auth = pr.map (x => x.get("auth").get).getOrElse(throw new Exception("token parse error"))
-            val product_level = (auth \ "scope" \ "category").asOpt[List[String]].
+            val mergeJs=MergeJs.dataMergeWithPr(data,pr)
+            val product_level = (mergeJs \ "auth" \ "scope" \ "category").asOpt[List[String]].
                 map (x => x).getOrElse(throw new Exception("token parse error"))
 
             var result = pr.get
             // val lst = (data \ "condition" \ "category").asOpt[List[String]].map (x => x).getOrElse(Nil)
-            val lst = (data \ "condition" \ "category").asOpt[String].map (x => x).getOrElse("") :: Nil
+            val lst = (mergeJs \ "condition" \ "category").asOpt[String].map (x => x).getOrElse("") :: Nil
             val category_lst = productLevel2Category(lst).distinct.sorted
             val auth_cat_lst = productLevel2Category(product_level).distinct.sorted
             val reVal = if (auth_cat_lst.isEmpty) category_lst
@@ -209,9 +225,9 @@ object AuthModule extends ModuleTrait with AuthData {
                                  (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
 
         try {
-            val auth = pr.map (x => x.get("auth").get).getOrElse(throw new Exception("token parse error"))
-            val name_lst = (auth \ "scope" \ "manufacture_name").asOpt[List[String]].map (x => x.distinct.sorted).getOrElse(throw new Exception("token parse error"))
-            (data \ "condition" \ "manufacture_name").asOpt[List[String]].map { x =>
+            val mergeJs=MergeJs.dataMergeWithPr(data,pr)
+            val name_lst = (mergeJs\ "auth" \ "scope" \ "manufacture_name").asOpt[List[String]].map (x => x.distinct.sorted).getOrElse(throw new Exception("token parse error"))
+            (mergeJs \ "condition" \ "manufacture_name").asOpt[List[String]].map { x =>
                 val name_condition = x.distinct.sorted
                 var result = pr.get
                 var names : List[String] = Nil
@@ -243,15 +259,12 @@ object AuthModule extends ModuleTrait with AuthData {
                             (pr : Option[Map[String, JsValue]])
                             (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue])={
         try{
-            val auth=pr.map(x => x.get("auth").get).getOrElse(throw new Exception("token auth prase error"))
-            val sampleScope=( auth \ "scope" \ "sample").asOpt[Int].getOrElse(throw new Exception("token sample prase error "))
+            val mergeJs=MergeJs.dataMergeWithPr(data,pr)
+            val sampleScope=(mergeJs \ "auth" \ "scope" \ "sample").asOpt[Int].getOrElse(throw new Exception("token sample prase error "))
             var result=pr.get
             if(sampleScope == 0){
                 result = result + ("Warning" -> toJson("没有公司名称搜索的全权限，请联系你的管理员添加"))
-            }else{
-                result =result + ("Warning" -> toJson("None"))
             }
-            println(result)
             (Some(result), None)
         }catch {
             case ex :Exception => (None,Some(ErrorCode.errorToJson(ex.getMessage)))
@@ -263,8 +276,8 @@ object AuthModule extends ModuleTrait with AuthData {
                             (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
 
         try {
-            val auth = pr.map (x => x.get("auth").get).getOrElse(throw new Exception("token parse error"))
-            val expire_in = (auth \ "expire_in").asOpt[Long].map (x => x).getOrElse(throw new Exception("token parse error"))
+            val mergeJs=MergeJs.dataMergeWithPr(data,pr)
+            val expire_in = (mergeJs \ "auth" \ "expire_in").asOpt[Long].map (x => x).getOrElse(throw new Exception("token parse error"))
 
             if (new Date().getTime > expire_in) throw new Exception("token expired")
             else (pr, None)
